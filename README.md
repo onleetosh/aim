@@ -1,5 +1,4 @@
-# aim
-A modern Kanban-style task manager designed to help users organize goals, manage tasks, and track progress with Agile-inspired workflows.
+# A.I.M
 
 Many people set meaningful goals but struggle to turn them into consistent action. When a goal feels too large, unclear, or overwhelming, it can be difficult to know where to begin or what to do next. This often leads to procrastination, loss of focus, and stalled progress, leaving important tasks unfinished or taking longer than expected to complete.
 
