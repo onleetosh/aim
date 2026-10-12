@@ -135,8 +135,8 @@ There is a significant gap between understanding what matters and taking consist
 ### Back end
 | Piece | Choice | Why |
 |---|---|---|
-| Server / API |  Node.js / Python ?? | TBD |
-| Data storage | MongoDB or PostgreSQL ?? | TBD |
+| Server / API | Python / Flask | Lightweight HTTP API for the MVP |
+| Data storage | SQLite | Local relational database with no separate database server |
 | Outside services (optional) |TBD| |
 | Hosting / deploy | TBD |  |
 
@@ -145,8 +145,8 @@ There is a significant gap between understanding what matters and taking consist
 ```mermaid
 flowchart LR
     U["User"] --> FE["React Front End"]
-    FE --> API["Node.js / Express API"]
-    API --> DB[("PostgreSQL Database")]
+    FE["HTML/CSS/JavaScript"] --> API["Python / Flask API"]
+    API --> DB[("SQLite Database")]
 
 ```
 
@@ -170,3 +170,14 @@ flowchart LR
 - Whether the initial feature set is achievable within the project timeline.
 - Whether the implemented workflow addresses the original problem rather than simply recreating a digital whiteboard.
 - Whether the application reliably saves and retrieves goals and task progress.
+
+## 7. Running the MVP
+
+The MVP uses a Flask backend and SQLite database. Install the Python dependency and start the application:
+
+```bash
+python -m pip install -r requirements.txt
+python app.py
+```
+
+Then visit `http://localhost:5000`. The server creates `aim.db` automatically and stores projects and tasks there between sessions. The initial demo projects and tasks are inserted only when the database is empty.
