@@ -32,13 +32,36 @@ def initialize_database():
                 project_id INTEGER NOT NULL,
                 title TEXT NOT NULL CHECK(length(trim(title)) > 0),
                 description TEXT NOT NULL DEFAULT '',
-                status TEXT NOT NULL DEFAULT 'ready'
-                    CHECK(status IN ('ready', 'progress', 'review', 'done')),
+                status TEXT NOT NULL DEFAULT 'new'
+                    CHECK(status IN ('new', 'ready', 'progress', 'review', 'done')),
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
             );
             """
         )
+        task_columns = connection.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'tasks'"
+        ).fetchone()[0]
+        if "CHECK(status IN ('ready', 'progress', 'review', 'done'))" in task_columns:
+            connection.executescript(
+                """
+                ALTER TABLE tasks RENAME TO tasks_old;
+                CREATE TABLE tasks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    project_id INTEGER NOT NULL,
+                    title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+                    description TEXT NOT NULL DEFAULT '',
+                    status TEXT NOT NULL DEFAULT 'new'
+                        CHECK(status IN ('new', 'ready', 'progress', 'review', 'done')),
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+                );
+                INSERT INTO tasks (id, project_id, title, description, status, created_at)
+                    SELECT id, project_id, title, description, status, created_at
+                    FROM tasks_old;
+                DROP TABLE tasks_old;
+                """
+            )
         if connection.execute("SELECT COUNT(*) FROM projects").fetchone()[0] == 0:
             projects = [
                 ("Finish coursework", "Keep the semester moving forward."),
@@ -172,7 +195,7 @@ def create_task():
 def update_task(task_id):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
-    allowed_statuses = {"ready", "progress", "review", "done"}
+    allowed_statuses = {"new", "ready", "progress", "review", "done"}
     if status not in allowed_statuses:
         return jsonify({"error": "Invalid task status."}), 400
 

@@ -96,6 +96,8 @@ There is a significant gap between understanding what matters and taking consist
 * **Create a Goal:** Establish a goal or project with a title and description.
 * **Break It Down:** Create actionable tasks or steps associated with a goal.
 * **Manage Workflow:** Move tasks through a simple Kanban workflow: Ready → In Progress → Review → Done.
+* **Project Details:** Open a project to view its description and tasks grouped into New, Active, and Complete.
+* **Drag and Drop:** Move task cards between board columns or project detail groups.
 
 ### Later
 
@@ -181,3 +183,7 @@ python app.py
 ```
 
 Then visit `http://localhost:5000`. The server creates `aim.db` automatically and stores projects and tasks there between sessions. The initial demo projects and tasks are inserted only when the database is empty.
+
+You can also open `index.html` directly with `file://`. In that mode the interface uses browser local storage because a local HTML file cannot connect to the Flask API. To use the SQLite database, start Flask and visit `http://localhost:5000` instead.
+
+New tasks begin in the project's **New** group. Dragging a task into **Active** changes its status to `Ready`, placing it in the Ready board column. Dragging a task to **Complete** changes its status to `Done`; completed tasks remain available in the project detail view.
