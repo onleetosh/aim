@@ -1,3 +1,4 @@
+/* Responsive overrides for tablet and mobile layouts. */
 @media (max-width: 600px) {
   .project-detail-header { align-items: start; flex-direction: column; }
   .project-summary { grid-template-columns: repeat(3, 1fr); }

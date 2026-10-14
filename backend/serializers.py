@@ -1,3 +1,4 @@
+# Convert database rows to the camelCase shape expected by the browser.
 def project_from_row(row):
     return {
         "id": str(row["id"]),

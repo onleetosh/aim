@@ -1,3 +1,4 @@
+// Form dialogs are kept separate from the board and project renderers.
 import { apiRequest, loadState } from "./api.js";
 import { setSelectedProject, detailProjectId } from "./config.js";
 import { $, runAction } from "./utils.js";

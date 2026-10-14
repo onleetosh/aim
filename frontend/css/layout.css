@@ -1,3 +1,4 @@
+/* Page shell, sidebar navigation, and shared controls. */
 .app-shell { display: flex; min-height: 100vh; }
 .sidebar { width: 260px; background: #e9f1ec; display: flex; flex-direction: column; padding: 30px 22px 24px; }
 .brand { color: var(--ink); display: flex; gap: 12px; align-items: center; text-decoration: none; }

@@ -1,3 +1,4 @@
+/* Dialog layout and form control styling. */
 .modal { border: 0; border-radius: 14px; box-shadow: 0 20px 70px rgba(16,35,28,.22); padding: 0; width: min(450px, calc(100% - 30px)); }
 .modal::backdrop { background: rgba(23,35,31,.35); backdrop-filter: blur(3px); }
 .modal form { padding: 26px; }

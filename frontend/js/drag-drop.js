@@ -1,5 +1,7 @@
+// Supports both pointer events and legacy mouse events for broad browser input.
 import { moveTask } from "./api.js";
 
+// Only one drag operation may be active at a time.
 let pointerDrag = null;
 let mouseDrag = null;
 

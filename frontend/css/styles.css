@@ -1,3 +1,4 @@
+/* Single CSS entry point loaded by the template. */
 @import url("./base.css");
 @import url("./layout.css");
 @import url("./board.css");

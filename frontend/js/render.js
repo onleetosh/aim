@@ -1,9 +1,11 @@
+// Rendering functions turn application state into board and project DOM nodes.
 import { statuses, state, selectedProject, detailProjectId, setSelectedProject, setDetailProjectId } from "./config.js";
 import { apiRequest, loadState, moveTask } from "./api.js";
 import { $, escapeHtml, runAction } from "./utils.js";
 import { startDrag, initializeDragDrop } from "./drag-drop.js";
 
 export function render() {
+  // Rebuild each view from state after an API or user action changes data.
   renderProjectFilters();
   renderBoard();
   renderProjects();
@@ -44,6 +46,7 @@ function renderBoard() {
 }
 
 export function createTaskCard(task) {
+  // Cards are rebuilt after state changes so status and project labels stay current.
   const card = document.createElement("article");
   const project = state.projects.find((item) => item.id === task.projectId);
   const nextStatus = statuses[Math.min(statuses.findIndex((item) => item.id === task.status) + 1, statuses.length - 1)];

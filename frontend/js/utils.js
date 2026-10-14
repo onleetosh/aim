@@ -1,3 +1,4 @@
+// Small browser helpers shared by the UI modules.
 export const $ = (selector) => document.querySelector(selector);
 
 export function escapeHtml(value) {

@@ -1,3 +1,4 @@
+/* Board filters, columns, task cards, and drag/drop states. */
 .goal-strip { display: flex; gap: 8px; margin: 27px 0 21px; overflow-x: auto; padding-bottom: 3px; }
 .goal-filter { background: transparent; border: 1px solid var(--line); border-radius: 30px; color: var(--muted); padding: 7px 14px; white-space: nowrap; }
 .goal-filter.active, .goal-filter:hover { border-color: var(--green); color: var(--green); background: #edf6f1; }

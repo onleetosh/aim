@@ -1,3 +1,4 @@
+// Shared UI state is kept in one module so renderers and event handlers agree.
 export const statuses = [
   { id: "new", label: "New" },
   { id: "ready", label: "Ready" },

@@ -1,3 +1,4 @@
+// Frontend entry point: connect navigation, forms, and the initial data load.
 import { loadState } from "./api.js";
 import { setDetailProjectId } from "./config.js";
 import { showView } from "./render.js";

@@ -1,3 +1,4 @@
+# SQLite setup, connection management, schema creation, and demo seed data.
 import sqlite3
 from pathlib import Path
 
@@ -7,6 +8,7 @@ DATABASE_PATH = BASE_DIR / "aim.db"
 
 
 def get_connection():
+    # Row objects let serializers address columns by name instead of position.
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
@@ -39,6 +41,7 @@ def initialize_database():
         task_columns = connection.execute(
             "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'tasks'"
         ).fetchone()[0]
+        # Rebuild databases created before the "new" task status was introduced.
         if "CHECK(status IN ('ready', 'progress', 'review', 'done'))" in task_columns:
             connection.executescript(
                 """
@@ -59,6 +62,7 @@ def initialize_database():
                 DROP TABLE tasks_old;
                 """
             )
+        # Seed only an empty database so existing user data is never overwritten.
         if connection.execute("SELECT COUNT(*) FROM projects").fetchone()[0] == 0:
             projects = [
                 ("Finish coursework", "Keep the semester moving forward."),

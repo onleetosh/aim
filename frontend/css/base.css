@@ -1,3 +1,4 @@
+/* Shared design tokens and browser-wide defaults. */
 :root {
   --ink: #17231f;
   --muted: #6c7973;

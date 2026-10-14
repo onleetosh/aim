@@ -1,3 +1,4 @@
+/* Project cards and the grouped project-detail view. */
 .goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 30px; }
 .goal-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 21px; box-shadow: var(--shadow); }
 .project-card { cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s; }

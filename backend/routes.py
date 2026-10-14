@@ -1,3 +1,4 @@
+# HTTP routes for the page and the project/task JSON API.
 from flask import Blueprint, jsonify, render_template, request
 
 from .database import get_connection

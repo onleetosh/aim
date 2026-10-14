@@ -1,8 +1,10 @@
+// Keep transport details out of rendering and form modules.
 import { state } from "./config.js";
 import { render } from "./render.js";
 import { showError } from "./utils.js";
 
 const LOCAL_STORAGE_KEY = "aim-file-mode-state";
+// Opening index.html directly uses localStorage because fetch cannot reach Flask.
 const fileMode = window.location.protocol === "file:";
 
 export async function apiRequest(path, options = {}) {
@@ -19,6 +21,7 @@ export async function apiRequest(path, options = {}) {
 }
 
 function localRequest(path, options = {}) {
+  // Mirror the API endpoints closely so file mode remains useful for demos.
   const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
   const localState = stored ? JSON.parse(stored) : {
     projects: [
