@@ -152,6 +152,59 @@ flowchart LR
 
 ```
 
+The Flask backend is organized as a Python package:
+
+```text
+app.py                 # Application entry point
+backend/
+├── __init__.py        # Flask app factory
+├── database.py        # SQLite connection, schema, and seed data
+├── routes.py          # Web and API endpoints
+└── serializers.py     # Database-row to JSON conversion
+```
+
+The browser code is organized as JavaScript modules:
+
+```text
+frontend/js/
+├── main.js         # Browser entry point and navigation
+├── config.js       # Shared state and task statuses
+├── api.js          # Flask API and file-mode storage requests
+├── render.js       # Board, project, and task rendering
+├── drag-drop.js    # Task drag-and-drop behavior
+├── modals.js       # Task and project forms
+└── utils.js        # DOM, escaping, and action helpers
+```
+
+The CSS uses the same modular approach while keeping `styles.css` as the single
+stylesheet entry point:
+
+```text
+frontend/css/
+├── base.css        # Variables and global element defaults
+├── layout.css      # Shell, navigation, sidebar, and buttons
+├── board.css       # Filters, board columns, and task cards
+├── projects.css    # Project cards and project details
+├── modals.css      # Dialogs and form controls
+└── responsive.css  # Mobile and tablet layouts
+```
+
+The HTML is rendered as Flask/Jinja templates:
+
+```text
+templates/
+├── index.html
+└── components/
+    ├── app-shell.html
+    ├── sidebar.html
+    ├── topbar.html
+    ├── board-view.html
+    ├── goals-view.html
+    ├── project-detail-view.html
+    ├── modals.html
+    └── empty-state.html
+```
+
 ---
 
 ## 6. Open Questions
@@ -184,6 +237,6 @@ python app.py
 
 Then visit `http://localhost:5000`. The server creates `aim.db` automatically and stores projects and tasks there between sessions. The initial demo projects and tasks are inserted only when the database is empty.
 
-You can also open `index.html` directly with `file://`. In that mode the interface uses browser local storage because a local HTML file cannot connect to the Flask API. To use the SQLite database, start Flask and visit `http://localhost:5000` instead.
+The interface is rendered from Flask/Jinja templates. Start Flask and visit `http://localhost:5000` to load the page and use the SQLite database.
 
 New tasks begin in the project's **New** group. Dragging a task into **Active** changes its status to `Ready`, placing it in the Ready board column. Dragging a task to **Complete** changes its status to `Done`; completed tasks remain available in the project detail view.

@@ -1,0 +1,25 @@
+:root {
+  --ink: #17231f;
+  --muted: #6c7973;
+  --line: #dfe6e1;
+  --surface: #ffffff;
+  --canvas: #f5f7f4;
+  --green: #2b6555;
+  --green-dark: #214d41;
+  --mint: #dceee6;
+  --yellow: #f7e8ae;
+  --lavender: #e9e5f5;
+  --blue: #dcebf0;
+  --shadow: 0 10px 30px rgba(26, 47, 39, .07);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--canvas); font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { font: 400 clamp(30px, 4vw, 45px)/1.1 Georgia, serif; margin-bottom: 0; letter-spacing: -.03em; }
+h2 { font: 400 clamp(24px, 3vw, 32px)/1.2 Georgia, serif; margin-bottom: 0; letter-spacing: -.025em; }
+h3 { margin-bottom: 3px; font-size: 16px; }
+.eyebrow { color: var(--muted); font-size: 11px; letter-spacing: .11em; margin: 0 0 9px; text-transform: uppercase; font-weight: 700; }
+.hidden { display: none !important; }

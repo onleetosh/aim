@@ -1,0 +1,24 @@
+@media (max-width: 600px) {
+  .project-detail-header { align-items: start; flex-direction: column; }
+  .project-summary { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 850px) {
+  .sidebar { width: 205px; }
+  .content { padding: 38px 4%; }
+  .board { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .app-shell { display: block; }
+  .sidebar { width: 100%; padding: 16px 20px; }
+  .main-nav { margin-top: 20px; display: flex; }
+  .nav-item { flex: 1; }
+  .sidebar-footer { display: none; }
+  .content { padding: 30px 18px; }
+  .topbar { align-items: start; flex-direction: column; }
+  .view { margin-top: 40px; }
+  .section-heading { align-items: start; flex-direction: column; }
+  .board { grid-template-columns: 1fr; }
+  .column { min-height: 0; }
+}

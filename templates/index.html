@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A.I.M. helps turn goals into manageable actions and visible progress.">
+  <title>A.I.M. — Action, Intention, Momentum</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='frontend/css/styles.css') }}">
+</head>
+<body>
+  {% include "components/app-shell.html" %}
+  {% include "components/modals.html" %}
+  {% include "components/empty-state.html" %}
+  <script type="module" src="{{ url_for('static', filename='frontend/js/main.js') }}"></script>
+</body>
+</html>

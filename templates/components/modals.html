@@ -1,0 +1,29 @@
+<dialog class="modal" id="task-modal">
+  <form method="dialog" id="task-form">
+    <div class="modal-header">
+      <div><p class="eyebrow">Break it down</p><h2>New task</h2></div>
+      <button class="close-button" type="button" data-close="task-modal" aria-label="Close">×</button>
+    </div>
+    <label for="task-title">Task name <span>*</span></label>
+    <input id="task-title" name="title" type="text" placeholder="What is the next action?" required maxlength="100">
+    <label for="task-description">Description</label>
+    <textarea id="task-description" name="description" rows="3" placeholder="Add a little context (optional)" maxlength="240"></textarea>
+    <label for="task-goal">Project</label>
+    <select id="task-goal" name="project"></select>
+    <div class="modal-actions"><button class="secondary-button" type="button" data-close="task-modal">Cancel</button><button class="primary-button" type="submit">Add task</button></div>
+  </form>
+</dialog>
+
+<dialog class="modal" id="goal-modal">
+  <form method="dialog" id="goal-form">
+    <div class="modal-header">
+      <div><p class="eyebrow">Set a direction</p><h2>New project</h2></div>
+      <button class="close-button" type="button" data-close="goal-modal" aria-label="Close">×</button>
+    </div>
+    <label for="goal-title">Project name <span>*</span></label>
+    <input id="goal-title" name="title" type="text" placeholder="What do you want to accomplish?" required maxlength="80">
+    <label for="goal-description">Description</label>
+    <textarea id="goal-description" name="description" rows="5" placeholder="Why does this matter?"></textarea>
+    <div class="modal-actions"><button class="secondary-button" type="button" data-close="goal-modal">Cancel</button><button class="primary-button" type="submit">Create project</button></div>
+  </form>
+</dialog>
