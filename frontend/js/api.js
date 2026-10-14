@@ -42,6 +42,14 @@ function localRequest(path, options = {}) {
     saveLocalState(localState);
     return project;
   }
+  if (projectMatch && options.method === "DELETE") {
+    const projectExists = localState.projects.some((project) => project.id === projectMatch[1]);
+    if (!projectExists) throw new Error("Project not found.");
+    localState.projects = localState.projects.filter((project) => project.id !== projectMatch[1]);
+    localState.tasks = localState.tasks.filter((task) => task.projectId !== projectMatch[1]);
+    saveLocalState(localState);
+    return null;
+  }
   if (path === "/api/tasks" && options.method === "POST") {
     const task = { id: `local-task-${Date.now()}`, projectId: String(body.projectId), title: String(body.title).trim(), description: String(body.description || "").trim(), status: "new" };
     if (!task.title || !localState.projects.some((project) => project.id === task.projectId)) throw new Error("Task title and project are required.");

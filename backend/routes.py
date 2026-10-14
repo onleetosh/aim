@@ -39,6 +39,17 @@ def create_project():
         return jsonify(project_from_row(row)), 201
 
 
+@api.delete("/api/projects/<int:project_id>")
+def delete_project(project_id):
+    with get_connection() as connection:
+        cursor = connection.execute(
+            "DELETE FROM projects WHERE id = ?", (project_id,)
+        )
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Project not found."}), 404
+    return ("", 204)
+
+
 @api.post("/api/tasks")
 def create_task():
     data = request.get_json(silent=True) or {}

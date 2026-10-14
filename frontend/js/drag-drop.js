@@ -17,7 +17,8 @@ export function initializeDragDrop(dropZone, status) {
 }
 
 export function startDrag(event, card, taskId, type) {
-  if (event.button !== 0 || event.target.closest("button") || pointerDrag || mouseDrag) return;
+  const target = event.target instanceof Element ? event.target : null;
+  if (event.button !== 0 || target?.closest("button") || pointerDrag || mouseDrag) return;
   const bounds = card.getBoundingClientRect();
   const drag = { card, taskId, target: null, offsetX: event.clientX - bounds.left, offsetY: event.clientY - bounds.top, preview: card.cloneNode(true) };
   drag.preview.classList.add("drag-preview");

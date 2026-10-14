@@ -42,6 +42,8 @@ export function initializeModals() {
     });
   });
   document.addEventListener("click", (event) => {
-    if (event.target.matches('[data-action="new-task"]')) openTaskModal();
+    if (event.target instanceof Element && event.target.matches('[data-action="new-task"]')) {
+      openTaskModal();
+    }
   });
 }

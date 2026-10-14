@@ -76,10 +76,23 @@ function renderProjects() {
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${project.title} project`);
-    card.innerHTML = `<h3>${escapeHtml(project.title)}</h3><p>${escapeHtml(project.description || "A project without a description. Start with one small step.")}</p><div class="goal-progress"><span>${completed} of ${tasks.length} tasks complete</span><strong>${percent}%</strong></div><div class="progress-track"><span style="width:${percent}%"></span></div>`;
+    card.innerHTML = `<h3>${escapeHtml(project.title)}</h3><p>${escapeHtml(project.description || "A project without a description. Start with one small step.")}</p><div class="goal-progress"><span>${completed} of ${tasks.length} tasks complete</span><strong>${percent}%</strong></div><div class="progress-track"><span style="width:${percent}%"></span></div><div class="project-actions"><button type="button" class="delete-project-button" data-delete-project="${project.id}">Delete project</button></div>`;
     card.addEventListener("click", () => openProject(project.id));
     card.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(project.id); }
+    });
+    card.querySelector("[data-delete-project]").addEventListener("click", async (event) => {
+      event.stopPropagation();
+      if (!window.confirm(`Delete "${project.title}" and all of its tasks?`)) return;
+      await runAction(async () => {
+        await apiRequest(`/api/projects/${project.id}`, { method: "DELETE" });
+        if (detailProjectId === project.id) {
+          setDetailProjectId(null);
+          showView("goals");
+        }
+        setSelectedProject("all");
+        await loadState();
+      });
     });
     grid.append(card);
   });

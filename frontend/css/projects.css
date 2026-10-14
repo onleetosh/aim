@@ -6,6 +6,9 @@
 .goal-card p { color: var(--muted); font-size: 13px; min-height: 40px; margin: 8px 0 17px; }
 .goal-progress { color: var(--muted); display: flex; justify-content: space-between; font-size: 12px; }
 .goal-progress strong { color: var(--green); }
+.project-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+.delete-project-button { border: 1px solid var(--line); background: transparent; border-radius: 5px; color: var(--muted); font-size: 11px; padding: 5px 8px; }
+.delete-project-button:hover { border-color: #a84f3e; color: #a84f3e; }
 .project-detail-header { display: flex; justify-content: space-between; align-items: end; gap: 20px; }
 .project-description { color: var(--muted); font-size: 15px; line-height: 1.7; margin: 15px 0 0; max-width: 760px; white-space: pre-wrap; }
 .project-summary { display: grid; grid-template-columns: repeat(3, minmax(120px, 180px)); gap: 12px; margin: 30px 0 24px; }
