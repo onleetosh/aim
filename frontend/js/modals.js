@@ -24,20 +24,24 @@ export function initializeModals() {
   $("#project-new-task-button").addEventListener("click", () => openTaskModal(detailProjectId));
   $("#task-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const dialog = formElement.closest("dialog");
     await runAction(async () => {
       await apiRequest("/api/tasks", { method: "POST", body: JSON.stringify({ title: form.get("title"), description: form.get("description"), projectId: form.get("project") }) });
-      event.currentTarget.closest("dialog").close();
+      dialog.close();
       await loadState();
     });
   });
   $("#goal-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const dialog = formElement.closest("dialog");
     await runAction(async () => {
       const project = await apiRequest("/api/projects", { method: "POST", body: JSON.stringify({ title: form.get("title"), description: form.get("description") }) });
       setSelectedProject(project.id);
-      event.currentTarget.closest("dialog").close();
+      dialog.close();
       await loadState();
     });
   });
