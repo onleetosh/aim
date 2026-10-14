@@ -240,3 +240,21 @@ Then visit `http://localhost:5000`. The server creates `aim.db` automatically an
 The interface is rendered from Flask/Jinja templates. Start Flask and visit `http://localhost:5000` to load the page and use the SQLite database.
 
 New tasks begin in the project's **New** group. Dragging a task into **Active** changes its status to `Ready`, placing it in the Ready board column. Dragging a task to **Complete** changes its status to `Done`; completed tasks remain available in the project detail view.
+
+## 8. Deploying a test instance
+
+The repository includes a `render.yaml` Blueprint for deploying the Flask app to
+[Render](https://render.com). To create a public test URL:
+
+1. Push the repository, including `render.yaml` and the updated
+   `requirements.txt`, to GitHub.
+2. Sign in to Render and choose **New > Blueprint**.
+3. Connect `onleetosh/aim` and select the branch to deploy.
+4. Accept the service named `aim` and click **Apply**.
+5. Open the `onrender.com` URL Render assigns to the service.
+
+Render runs the app with Gunicorn and checks `/api/state` for service health.
+The current SQLite database is suitable for testing, but Render's free service
+has ephemeral storage, so database changes can be lost when the service
+restarts or is redeployed. Use a persistent disk or a hosted database before
+using this deployment for real data.
