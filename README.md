@@ -254,7 +254,18 @@ The repository includes a `render.yaml` Blueprint for deploying the Flask app to
 5. Open the `onrender.com` URL Render assigns to the service.
 
 Render runs the app with Gunicorn and checks `/api/state` for service health.
-The current SQLite database is suitable for testing, but Render's free service
-has ephemeral storage, so database changes can be lost when the service
-restarts or is redeployed. Use a persistent disk or a hosted database before
-using this deployment for real data.
+
+### Persistent data
+
+Without a `DATABASE_URL` environment variable the app uses a local SQLite file
+(`aim.db`). That file is erased whenever a Render service restarts or
+redeploys, so a deployed app must use PostgreSQL:
+
+1. Create a free PostgreSQL database (for example at [Neon](https://neon.tech)
+   or as a Render PostgreSQL instance) and copy its connection string.
+2. In the Render service, open **Environment** and add `DATABASE_URL` with that
+   connection string (Render prompts for it when applying the Blueprint).
+3. Redeploy. The app creates its tables and demo data on first start, then all
+   changes persist across restarts and redeploys.
+
+Locally, leave `DATABASE_URL` unset to keep using SQLite.

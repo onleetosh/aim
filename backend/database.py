@@ -1,4 +1,7 @@
-# SQLite setup, connection management, schema creation, and demo seed data.
+# Database connection management, schema creation, and demo seed data.
+# PostgreSQL is used when DATABASE_URL is set (deployment); otherwise a local
+# SQLite file is used so development needs no extra setup.
+import os
 import sqlite3
 from pathlib import Path
 
@@ -7,17 +10,93 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASE_PATH = BASE_DIR / "aim.db"
 
 
+def database_url():
+    return os.environ.get("DATABASE_URL", "").strip()
+
+
+class Connection:
+    """Small wrapper giving SQLite and PostgreSQL the same execute() interface."""
+
+    def __init__(self, raw, postgres):
+        self.raw = raw
+        self.postgres = postgres
+
+    def execute(self, sql, params=()):
+        if not self.postgres:
+            return self.raw.execute(sql, params)
+        sql = sql.replace("?", "%s")
+        is_insert = sql.lstrip().upper().startswith("INSERT")
+        if is_insert:
+            sql += " RETURNING id"
+        cursor = self.raw.execute(sql, params)
+        if is_insert:
+            cursor.lastrowid = cursor.fetchone()["id"]
+        return cursor
+
+    def executemany(self, sql, rows):
+        if not self.postgres:
+            return self.raw.executemany(sql, rows)
+        cursor = self.raw.cursor()
+        cursor.executemany(sql.replace("?", "%s"), rows)
+        return cursor
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        try:
+            if exc_type is None:
+                self.raw.commit()
+            else:
+                self.raw.rollback()
+        finally:
+            self.raw.close()
+
+
 def get_connection():
+    url = database_url()
+    if url:
+        import psycopg
+        from psycopg.rows import dict_row
+
+        return Connection(psycopg.connect(url, row_factory=dict_row), True)
     # Row objects let serializers address columns by name instead of position.
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
-    return connection
+    return Connection(connection, False)
 
 
 def initialize_database():
     with get_connection() as connection:
-        connection.executescript(
+        if connection.postgres:
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS projects (
+                    id SERIAL PRIMARY KEY,
+                    title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+                    description TEXT NOT NULL DEFAULT '',
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS tasks (
+                    id SERIAL PRIMARY KEY,
+                    project_id INTEGER NOT NULL
+                        REFERENCES projects(id) ON DELETE CASCADE,
+                    title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+                    description TEXT NOT NULL DEFAULT '',
+                    status TEXT NOT NULL DEFAULT 'new'
+                        CHECK(status IN ('new', 'ready', 'progress', 'review', 'done')),
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            _seed_if_empty(connection)
+            return
+        connection.raw.executescript(
             """
             CREATE TABLE IF NOT EXISTS projects (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +122,7 @@ def initialize_database():
         ).fetchone()[0]
         # Rebuild databases created before the "new" task status was introduced.
         if "CHECK(status IN ('ready', 'progress', 'review', 'done'))" in task_columns:
-            connection.executescript(
+            connection.raw.executescript(
                 """
                 ALTER TABLE tasks RENAME TO tasks_old;
                 CREATE TABLE tasks (
@@ -62,30 +141,34 @@ def initialize_database():
                 DROP TABLE tasks_old;
                 """
             )
-        # Seed only an empty database so existing user data is never overwritten.
-        if connection.execute("SELECT COUNT(*) FROM projects").fetchone()[0] == 0:
-            projects = [
-                ("Finish coursework", "Keep the semester moving forward."),
-                ("Build A.I.M.", "Turn the idea into a useful first version."),
-            ]
-            connection.executemany(
-                "INSERT INTO projects (title, description) VALUES (?, ?)", projects
-            )
-            project_ids = {
-                row["title"]: row["id"]
-                for row in connection.execute("SELECT id, title FROM projects")
-            }
-            connection.executemany(
-                """
-                INSERT INTO tasks (project_id, title, description, status)
-                VALUES (?, ?, ?, ?)
-                """,
-                [
-                    (project_ids["Finish coursework"], "Outline the research paper",
-                     "Draft the sections and add the first sources.", "progress"),
-                    (project_ids["Build A.I.M."], "Sketch the board layout",
-                     "Decide what information needs to be visible at a glance.", "review"),
-                    (project_ids["Finish coursework"], "Complete assigned reading", "", "ready"),
-                    (project_ids["Build A.I.M."], "Write the project intro", "", "done"),
-                ],
-            )
+        _seed_if_empty(connection)
+
+
+def _seed_if_empty(connection):
+    # Seed only an empty database so existing user data is never overwritten.
+    if connection.execute("SELECT COUNT(*) AS total FROM projects").fetchone()["total"] == 0:
+        projects = [
+            ("Finish coursework", "Keep the semester moving forward."),
+            ("Build A.I.M.", "Turn the idea into a useful first version."),
+        ]
+        connection.executemany(
+            "INSERT INTO projects (title, description) VALUES (?, ?)", projects
+        )
+        project_ids = {
+            row["title"]: row["id"]
+            for row in connection.execute("SELECT id, title FROM projects")
+        }
+        connection.executemany(
+            """
+            INSERT INTO tasks (project_id, title, description, status)
+            VALUES (?, ?, ?, ?)
+            """,
+            [
+                (project_ids["Finish coursework"], "Outline the research paper",
+                 "Draft the sections and add the first sources.", "progress"),
+                (project_ids["Build A.I.M."], "Sketch the board layout",
+                 "Decide what information needs to be visible at a glance.", "review"),
+                (project_ids["Finish coursework"], "Complete assigned reading", "", "ready"),
+                (project_ids["Build A.I.M."], "Write the project intro", "", "done"),
+            ],
+        )
