@@ -5,7 +5,7 @@ from functools import wraps
 from flask import Blueprint, jsonify, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .database import get_connection, integrity_errors, seed_user_data
+from .database import get_connection, integrity_errors
 
 
 auth = Blueprint("auth", __name__, url_prefix="/api/auth")
@@ -74,7 +74,6 @@ def register():
                 (username, generate_password_hash(password)),
             )
             user_id = cursor.lastrowid
-            seed_user_data(connection, user_id)
     except integrity_errors():
         return jsonify({"error": "That username is already taken."}), 409
 

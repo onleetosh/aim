@@ -175,43 +175,6 @@ def initialize_database():
             )
 
 
-def seed_user_data(connection, user_id):
-    # A user's first projects: adopt data that predates accounts if any exists,
-    # otherwise create starter examples.
-    orphans = connection.execute(
-        "SELECT COUNT(*) AS total FROM projects WHERE user_id IS NULL"
-    ).fetchone()["total"]
-    if orphans:
-        connection.execute(
-            "UPDATE projects SET user_id = ? WHERE user_id IS NULL", (user_id,)
-        )
-        return
-    project_ids = {}
-    for title, description in [
-        ("Finish coursework", "Keep the semester moving forward."),
-        ("Build A.I.M.", "Turn the idea into a useful first version."),
-    ]:
-        cursor = connection.execute(
-            "INSERT INTO projects (title, description, user_id) VALUES (?, ?, ?)",
-            (title, description, user_id),
-        )
-        project_ids[title] = cursor.lastrowid
-    connection.executemany(
-        """
-        INSERT INTO tasks (project_id, title, description, status)
-        VALUES (?, ?, ?, ?)
-        """,
-        [
-            (project_ids["Finish coursework"], "Outline the research paper",
-             "Draft the sections and add the first sources.", "progress"),
-            (project_ids["Build A.I.M."], "Sketch the board layout",
-             "Decide what information needs to be visible at a glance.", "review"),
-            (project_ids["Finish coursework"], "Complete assigned reading", "", "ready"),
-            (project_ids["Build A.I.M."], "Write the project intro", "", "done"),
-        ],
-    )
-
-
 def integrity_errors():
     errors = [sqlite3.IntegrityError]
     if database_url():

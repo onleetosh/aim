@@ -158,7 +158,7 @@ The Flask backend is organized as a Python package:
 app.py                 # Application entry point
 backend/
 ├── __init__.py        # Flask app factory
-├── database.py        # SQLite connection, schema, and seed data
+├── database.py        # SQLite/PostgreSQL connection and schema
 ├── routes.py          # Web and API endpoints
 └── serializers.py     # Database-row to JSON conversion
 ```
@@ -237,7 +237,7 @@ python app.py
 
 Or, if you have GNU `make` installed, run `make run`. It creates `.venv`, installs the dependencies, and starts the dev server. `make help` lists the other targets.
 
-Then visit `http://localhost:5000`. You will see a login screen; choose **Create an account** to sign up. Each account has its own projects and tasks, and new accounts start with a few example projects. The server creates `aim.db` automatically and stores accounts, projects, and tasks there between sessions. Projects that existed before accounts were added are adopted by the first account created.
+Then visit `http://localhost:5000`. You will see a login screen; choose **Create an account** to sign up. Each account has its own projects and tasks, and new accounts start empty. The server creates `aim.db` automatically and stores accounts, projects, and tasks there between sessions.
 
 The interface is rendered from Flask/Jinja templates. Start Flask and visit `http://localhost:5000` to load the page and use the SQLite database.
 
@@ -267,7 +267,7 @@ redeploys, so a deployed app must use PostgreSQL:
    or as a Render PostgreSQL instance) and copy its connection string.
 2. In the Render service, open **Environment** and add `DATABASE_URL` with that
    connection string (Render prompts for it when applying the Blueprint).
-3. Redeploy. The app creates its tables and demo data on first start, then all
+3. Redeploy. The app creates its tables on first start, then all
    changes persist across restarts and redeploys.
 
 Locally, leave `DATABASE_URL` unset to keep using SQLite.
