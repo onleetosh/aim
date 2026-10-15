@@ -72,12 +72,29 @@ def initialize_database():
         if connection.postgres:
             connection.execute(
                 """
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    username TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            connection.execute(
+                """
                 CREATE TABLE IF NOT EXISTS projects (
                     id SERIAL PRIMARY KEY,
                     title TEXT NOT NULL CHECK(length(trim(title)) > 0),
                     description TEXT NOT NULL DEFAULT '',
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
+                """
+            )
+            # Databases created before accounts existed get an owner column.
+            connection.execute(
+                """
+                ALTER TABLE projects ADD COLUMN IF NOT EXISTS user_id INTEGER
+                    REFERENCES users(id) ON DELETE CASCADE
                 """
             )
             connection.execute(
@@ -94,10 +111,16 @@ def initialize_database():
                 )
                 """
             )
-            _seed_if_empty(connection)
             return
         connection.raw.executescript(
             """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS projects (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL CHECK(length(trim(title)) > 0),
@@ -141,34 +164,58 @@ def initialize_database():
                 DROP TABLE tasks_old;
                 """
             )
-        _seed_if_empty(connection)
-
-
-def _seed_if_empty(connection):
-    # Seed only an empty database so existing user data is never overwritten.
-    if connection.execute("SELECT COUNT(*) AS total FROM projects").fetchone()["total"] == 0:
-        projects = [
-            ("Finish coursework", "Keep the semester moving forward."),
-            ("Build A.I.M.", "Turn the idea into a useful first version."),
+        # Databases created before accounts existed get an owner column.
+        project_columns = [
+            row["name"] for row in connection.execute("PRAGMA table_info(projects)")
         ]
-        connection.executemany(
-            "INSERT INTO projects (title, description) VALUES (?, ?)", projects
+        if "user_id" not in project_columns:
+            connection.execute(
+                "ALTER TABLE projects ADD COLUMN user_id INTEGER "
+                "REFERENCES users(id) ON DELETE CASCADE"
+            )
+
+
+def seed_user_data(connection, user_id):
+    # A user's first projects: adopt data that predates accounts if any exists,
+    # otherwise create starter examples.
+    orphans = connection.execute(
+        "SELECT COUNT(*) AS total FROM projects WHERE user_id IS NULL"
+    ).fetchone()["total"]
+    if orphans:
+        connection.execute(
+            "UPDATE projects SET user_id = ? WHERE user_id IS NULL", (user_id,)
         )
-        project_ids = {
-            row["title"]: row["id"]
-            for row in connection.execute("SELECT id, title FROM projects")
-        }
-        connection.executemany(
-            """
-            INSERT INTO tasks (project_id, title, description, status)
-            VALUES (?, ?, ?, ?)
-            """,
-            [
-                (project_ids["Finish coursework"], "Outline the research paper",
-                 "Draft the sections and add the first sources.", "progress"),
-                (project_ids["Build A.I.M."], "Sketch the board layout",
-                 "Decide what information needs to be visible at a glance.", "review"),
-                (project_ids["Finish coursework"], "Complete assigned reading", "", "ready"),
-                (project_ids["Build A.I.M."], "Write the project intro", "", "done"),
-            ],
+        return
+    project_ids = {}
+    for title, description in [
+        ("Finish coursework", "Keep the semester moving forward."),
+        ("Build A.I.M.", "Turn the idea into a useful first version."),
+    ]:
+        cursor = connection.execute(
+            "INSERT INTO projects (title, description, user_id) VALUES (?, ?, ?)",
+            (title, description, user_id),
         )
+        project_ids[title] = cursor.lastrowid
+    connection.executemany(
+        """
+        INSERT INTO tasks (project_id, title, description, status)
+        VALUES (?, ?, ?, ?)
+        """,
+        [
+            (project_ids["Finish coursework"], "Outline the research paper",
+             "Draft the sections and add the first sources.", "progress"),
+            (project_ids["Build A.I.M."], "Sketch the board layout",
+             "Decide what information needs to be visible at a glance.", "review"),
+            (project_ids["Finish coursework"], "Complete assigned reading", "", "ready"),
+            (project_ids["Build A.I.M."], "Write the project intro", "", "done"),
+        ],
+    )
+
+
+def integrity_errors():
+    errors = [sqlite3.IntegrityError]
+    if database_url():
+        import psycopg
+
+        errors.append(psycopg.IntegrityError)
+    return tuple(errors)

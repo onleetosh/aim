@@ -1,0 +1,32 @@
+<!-- Home screen for logged-out visitors: one card toggles login and sign-up. -->
+<main class="auth-page">
+  <section class="auth-hero" aria-label="About A.I.M.">
+    <a class="brand" href="/" aria-label="A.I.M. home">
+      <span class="brand-mark">A</span>
+      <span>
+        <strong>A.I.M.</strong>
+        <small>Action, Intention, Momentum</small>
+      </span>
+    </a>
+    <h1>Turn goals into visible progress.</h1>
+    <p>Break big projects into small actions, move them across your board, and keep your momentum going.</p>
+  </section>
+
+  <section class="auth-card" aria-labelledby="auth-heading">
+    <p class="eyebrow" id="auth-eyebrow">Welcome back</p>
+    <h2 id="auth-heading">Log in</h2>
+    <form id="auth-form" novalidate>
+      <label for="auth-username">Username</label>
+      <input id="auth-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required minlength="3" maxlength="30">
+      <label for="auth-password">Password</label>
+      <input id="auth-password" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128">
+      <p class="auth-hint hidden" id="auth-hint">At least 8 characters.</p>
+      <p class="auth-error hidden" id="auth-error" role="alert"></p>
+      <button class="primary-button auth-submit" id="auth-submit" type="submit">Log in</button>
+    </form>
+    <p class="auth-switch">
+      <span id="auth-switch-text">New to A.I.M.?</span>
+      <button class="text-button" id="auth-switch-button" type="button">Create an account</button>
+    </p>
+  </section>
+</main>

@@ -1,8 +1,12 @@
 # Application factory and project-level Flask configuration.
+import os
+import secrets
+from datetime import timedelta
 from pathlib import Path
 
 from flask import Flask
 
+from .auth import auth
 from .database import initialize_database
 from .routes import api
 
@@ -11,14 +15,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def create_app():
-    # Serve the frontend directly from the repository while rendering templates
-    # from the dedicated templates directory.
+    # Only the frontend directory is public; the database and source stay private.
     app = Flask(
         __name__,
-        static_folder=str(BASE_DIR),
-        static_url_path="",
+        static_folder=str(BASE_DIR / "frontend"),
+        static_url_path="/frontend",
         template_folder=str(BASE_DIR / "templates"),
     )
+    # Set SECRET_KEY in production so sessions survive restarts; a random key
+    # is fine locally but logs everyone out whenever the server restarts.
+    app.config.update(
+        SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
+        PERMANENT_SESSION_LIFETIME=timedelta(days=14),
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+        # Render sets RENDER=true and serves the app over HTTPS.
+        SESSION_COOKIE_SECURE=bool(os.environ.get("RENDER")),
+    )
+    app.register_blueprint(auth)
     app.register_blueprint(api)
     initialize_database()
     return app

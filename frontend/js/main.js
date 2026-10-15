@@ -15,5 +15,10 @@ document.querySelector("#back-to-projects").addEventListener("click", () => {
   showView("goals");
 });
 
+document.querySelector("#logout-button").addEventListener("click", async () => {
+  await fetch("/api/auth/logout", { method: "POST" });
+  window.location.reload();
+});
+
 initializeModals();
 loadState();

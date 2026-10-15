@@ -17,21 +17,25 @@ def task_from_row(row):
     }
 
 
-def state_response(connection):
+def state_response(connection, user_id):
     projects = [
         project_from_row(row)
         for row in connection.execute(
-            "SELECT id, title, description FROM projects ORDER BY id"
+            "SELECT id, title, description FROM projects WHERE user_id = ? ORDER BY id",
+            (user_id,),
         )
     ]
     tasks = [
         task_from_row(row)
         for row in connection.execute(
             """
-            SELECT id, project_id, title, description, status
+            SELECT tasks.id, tasks.project_id, tasks.title, tasks.description, tasks.status
             FROM tasks
-            ORDER BY id
-            """
+            JOIN projects ON projects.id = tasks.project_id
+            WHERE projects.user_id = ?
+            ORDER BY tasks.id
+            """,
+            (user_id,),
         )
     ]
     return {"projects": projects, "tasks": tasks}

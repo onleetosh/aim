@@ -13,6 +13,11 @@ export async function apiRequest(path, options = {}) {
     headers: { "Content-Type": "application/json" },
     ...options
   });
+  if (response.status === 401) {
+    // The session expired; reloading shows the login screen.
+    window.location.reload();
+    throw new Error("Your session has expired. Please log in again.");
+  }
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
     throw new Error(body.error || "The server could not complete that request.");

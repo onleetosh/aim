@@ -235,7 +235,7 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
-Then visit `http://localhost:5000`. The server creates `aim.db` automatically and stores projects and tasks there between sessions. The initial demo projects and tasks are inserted only when the database is empty.
+Then visit `http://localhost:5000`. You will see a login screen; choose **Create an account** to sign up. Each account has its own projects and tasks, and new accounts start with a few example projects. The server creates `aim.db` automatically and stores accounts, projects, and tasks there between sessions. Projects that existed before accounts were added are adopted by the first account created.
 
 The interface is rendered from Flask/Jinja templates. Start Flask and visit `http://localhost:5000` to load the page and use the SQLite database.
 
@@ -269,3 +269,7 @@ redeploys, so a deployed app must use PostgreSQL:
    changes persist across restarts and redeploys.
 
 Locally, leave `DATABASE_URL` unset to keep using SQLite.
+
+Login sessions are signed with `SECRET_KEY`. The Blueprint generates one for
+Render automatically; locally a random key is used, so you are logged out
+whenever the dev server restarts (set `SECRET_KEY` to avoid that).

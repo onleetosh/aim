@@ -1,26 +1,33 @@
 # HTTP routes for the page and the project/task JSON API.
+# Every API route is scoped to the logged-in user's own projects.
 from flask import Blueprint, jsonify, render_template, request
 
+from .auth import current_user, login_required
 from .database import get_connection
 from .serializers import project_from_row, state_response, task_from_row
 
 
 api = Blueprint("api", __name__)
 
+OWNED_PROJECTS = "SELECT id FROM projects WHERE user_id = ?"
+
 
 @api.get("/")
 def index():
-    return render_template("index.html")
+    user = current_user()
+    return render_template("index.html", username=user["username"] if user else None)
 
 
 @api.get("/api/state")
-def get_state():
+@login_required
+def get_state(user):
     with get_connection() as connection:
-        return jsonify(state_response(connection))
+        return jsonify(state_response(connection, user["id"]))
 
 
 @api.post("/api/projects")
-def create_project():
+@login_required
+def create_project(user):
     data = request.get_json(silent=True) or {}
     title = str(data.get("title", "")).strip()
     description = str(data.get("description", "")).strip()
@@ -29,8 +36,8 @@ def create_project():
 
     with get_connection() as connection:
         cursor = connection.execute(
-            "INSERT INTO projects (title, description) VALUES (?, ?)",
-            (title, description),
+            "INSERT INTO projects (title, description, user_id) VALUES (?, ?, ?)",
+            (title, description, user["id"]),
         )
         row = connection.execute(
             "SELECT id, title, description FROM projects WHERE id = ?",
@@ -40,10 +47,12 @@ def create_project():
 
 
 @api.delete("/api/projects/<int:project_id>")
-def delete_project(project_id):
+@login_required
+def delete_project(user, project_id):
     with get_connection() as connection:
         cursor = connection.execute(
-            "DELETE FROM projects WHERE id = ?", (project_id,)
+            "DELETE FROM projects WHERE id = ? AND user_id = ?",
+            (project_id, user["id"]),
         )
         if cursor.rowcount == 0:
             return jsonify({"error": "Project not found."}), 404
@@ -51,7 +60,8 @@ def delete_project(project_id):
 
 
 @api.post("/api/tasks")
-def create_task():
+@login_required
+def create_task(user):
     data = request.get_json(silent=True) or {}
     title = str(data.get("title", "")).strip()
     description = str(data.get("description", "")).strip()
@@ -61,7 +71,8 @@ def create_task():
 
     with get_connection() as connection:
         project = connection.execute(
-            "SELECT id FROM projects WHERE id = ?", (project_id,)
+            "SELECT id FROM projects WHERE id = ? AND user_id = ?",
+            (project_id, user["id"]),
         ).fetchone()
         if project is None:
             return jsonify({"error": "The selected project does not exist."}), 400
@@ -83,7 +94,8 @@ def create_task():
 
 
 @api.patch("/api/tasks/<int:task_id>")
-def update_task(task_id):
+@login_required
+def update_task(user, task_id):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
     allowed_statuses = {"new", "ready", "progress", "review", "done"}
@@ -92,7 +104,8 @@ def update_task(task_id):
 
     with get_connection() as connection:
         cursor = connection.execute(
-            "UPDATE tasks SET status = ? WHERE id = ?", (status, task_id)
+            f"UPDATE tasks SET status = ? WHERE id = ? AND project_id IN ({OWNED_PROJECTS})",
+            (status, task_id, user["id"]),
         )
         if cursor.rowcount == 0:
             return jsonify({"error": "Task not found."}), 404
@@ -107,9 +120,13 @@ def update_task(task_id):
 
 
 @api.delete("/api/tasks/<int:task_id>")
-def delete_task(task_id):
+@login_required
+def delete_task(user, task_id):
     with get_connection() as connection:
-        cursor = connection.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+        cursor = connection.execute(
+            f"DELETE FROM tasks WHERE id = ? AND project_id IN ({OWNED_PROJECTS})",
+            (task_id, user["id"]),
+        )
         if cursor.rowcount == 0:
             return jsonify({"error": "Task not found."}), 404
     return ("", 204)
