@@ -235,6 +235,8 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
+Or, if you have GNU `make` installed, run `make run`. It creates `.venv`, installs the dependencies, and starts the dev server. `make help` lists the other targets.
+
 Then visit `http://localhost:5000`. You will see a login screen; choose **Create an account** to sign up. Each account has its own projects and tasks, and new accounts start with a few example projects. The server creates `aim.db` automatically and stores accounts, projects, and tasks there between sessions. Projects that existed before accounts were added are adopted by the first account created.
 
 The interface is rendered from Flask/Jinja templates. Start Flask and visit `http://localhost:5000` to load the page and use the SQLite database.
