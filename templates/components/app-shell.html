@@ -6,5 +6,15 @@
     {% include "components/board-view.html" %}
     {% include "components/goals-view.html" %}
     {% include "components/project-detail-view.html" %}
+    {% include "components/dashboard-view.html" %}
+    <div class="view hidden" id="time-workspace">
+      <h2 class="workspace-heading">Time tracking</h2>
+      {% include "components/focus-view.html" %}
+      {% include "components/downtime-view.html" %}
+    </div>
+    <div class="view hidden" id="analytics-workspace">
+      {% include "components/insights-view.html" %}
+      {% include "components/analytics-view.html" %}
+    </div>
   </main>
 </div>

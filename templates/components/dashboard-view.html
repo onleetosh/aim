@@ -1,0 +1,65 @@
+<!-- Dashboard: intention, action, momentum, and awareness in one place. -->
+<section class="view hidden" id="dashboard-view" aria-labelledby="dashboard-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Intention → Action → Momentum</p>
+      <h2 id="dashboard-heading">Dashboard</h2>
+    </div>
+    <div class="dashboard-actions">
+      <button class="secondary-button" id="dashboard-new-task-button" type="button">+ New task</button>
+      <button class="primary-button" id="dashboard-new-project-button" type="button">+ New project</button>
+    </div>
+  </div>
+
+  <div class="recommendation" id="dash-recommendation" aria-live="polite"></div>
+
+  <div class="time-summary" id="dash-overview"></div>
+
+  <div class="time-panel time-block">
+    <p class="eyebrow">Today</p>
+    <h3>Priority tasks</h3>
+    <div id="dash-priorities"></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="time-panel">
+      <p class="eyebrow">Intention</p>
+      <h3>Am I working toward the goals that matter?</h3>
+      <div id="dash-intention"></div>
+    </div>
+    <div class="time-panel">
+      <p class="eyebrow">Action</p>
+      <h3>Am I completing the steps I planned?</h3>
+      <div id="dash-action"></div>
+    </div>
+  </div>
+
+  <div class="time-panel time-block">
+    <p class="eyebrow">Momentum</p>
+    <h3>Am I making consistent progress?</h3>
+    <div id="dash-momentum"></div>
+  </div>
+
+  <div class="time-panel time-block">
+    <p class="eyebrow">Awareness</p>
+    <h3>What is helping or preventing progress?</h3>
+    <div id="dash-awareness"></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="time-panel">
+      <p class="eyebrow">Plan accuracy</p>
+      <h3>Are my estimates realistic?</h3>
+      <div id="dash-plan"></div>
+    </div>
+    <div class="time-panel">
+      <p class="eyebrow">Logged vs unrecorded</p>
+      <h3>How much of my week is accounted for?</h3>
+      <div id="dash-accounting"></div>
+      <form class="time-form dash-settings" id="available-form">
+        <label>Available hours per day <input type="number" name="hours" min="0.5" max="24" step="0.5" required></label>
+        <button class="secondary-button" type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+</section>

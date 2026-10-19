@@ -9,7 +9,7 @@
 .auth-card input { border: 1px solid var(--line); border-radius: 7px; color: var(--ink); outline: 0; padding: 11px 12px; width: 100%; }
 .auth-card input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--mint); }
 .auth-hint { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
-.auth-error { background: #fbeeea; border-radius: 7px; color: #a84f3e; font-size: 13px; margin: 14px 0 0; padding: 9px 11px; }
+.auth-error { background: var(--red-soft); border-radius: 7px; color: var(--red-dark); font-size: 13px; margin: 14px 0 0; padding: 9px 11px; }
 .auth-submit { margin-top: 22px; width: 100%; }
 .auth-submit:disabled { opacity: .6; cursor: progress; }
 .auth-switch { color: var(--muted); font-size: 13px; margin: 20px 0 0; text-align: center; }

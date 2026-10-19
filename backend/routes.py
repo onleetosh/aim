@@ -1,15 +1,30 @@
 # HTTP routes for the page and the project/task JSON API.
 # Every API route is scoped to the logged-in user's own projects.
+from datetime import date
+
 from flask import Blueprint, jsonify, render_template, request
 
 from .auth import current_user, login_required
+from .dates import parse_date, parse_int
 from .database import get_connection
-from .serializers import project_from_row, state_response, task_from_row
+from .serializers import TASK_SELECT, project_from_row, state_response, task_from_row
 
 
 api = Blueprint("api", __name__)
 
 OWNED_PROJECTS = "SELECT id FROM projects WHERE user_id = ?"
+MAX_ESTIMATE_MINUTES = 10000
+
+
+def read_estimate(data):
+    """Returns (ok, value); an empty estimate clears the field."""
+    raw = data.get("estimateMinutes")
+    if raw is None or str(raw).strip() == "":
+        return True, None
+    value = parse_int(raw)
+    if value is None or not 1 <= value <= MAX_ESTIMATE_MINUTES:
+        return False, None
+    return True, value
 
 
 @api.get("/")
@@ -68,6 +83,10 @@ def create_task(user):
     project_id = data.get("projectId")
     if not title or not project_id:
         return jsonify({"error": "Task title and project are required."}), 400
+    estimate_ok, estimate = read_estimate(data)
+    if not estimate_ok:
+        return jsonify({"error": "Estimate must be between 1 and 10000 minutes."}), 400
+    today = parse_date(data.get("today")) or date.today().isoformat()
 
     with get_connection() as connection:
         project = connection.execute(
@@ -78,16 +97,13 @@ def create_task(user):
             return jsonify({"error": "The selected project does not exist."}), 400
         cursor = connection.execute(
             """
-            INSERT INTO tasks (project_id, title, description)
-            VALUES (?, ?, ?)
+            INSERT INTO tasks (project_id, title, description, updated_on, estimate_minutes)
+            VALUES (?, ?, ?, ?, ?)
             """,
-            (project_id, title, description),
+            (project_id, title, description, today, estimate),
         )
         row = connection.execute(
-            """
-            SELECT id, project_id, title, description, status
-            FROM tasks WHERE id = ?
-            """,
+            TASK_SELECT + " WHERE tasks.id = ?",
             (cursor.lastrowid,),
         ).fetchone()
         return jsonify(task_from_row(row)), 201
@@ -97,23 +113,41 @@ def create_task(user):
 @login_required
 def update_task(user, task_id):
     data = request.get_json(silent=True) or {}
-    status = data.get("status")
     allowed_statuses = {"new", "ready", "progress", "review", "done"}
-    if status not in allowed_statuses:
-        return jsonify({"error": "Invalid task status."}), 400
+    changes = {}
+    # The browser sends its local date so "today" matches the user's day.
+    today = parse_date(data.get("today")) or date.today().isoformat()
+    if "status" in data:
+        if data["status"] not in allowed_statuses:
+            return jsonify({"error": "Invalid task status."}), 400
+        changes["status"] = data["status"]
+        changes["completed_on"] = today if data["status"] == "done" else None
+    if "title" in data:
+        title = str(data["title"]).strip()
+        if not title:
+            return jsonify({"error": "Task title is required."}), 400
+        changes["title"] = title
+    if "description" in data:
+        changes["description"] = str(data["description"]).strip()
+    if "estimateMinutes" in data:
+        estimate_ok, estimate = read_estimate(data)
+        if not estimate_ok:
+            return jsonify({"error": "Estimate must be between 1 and 10000 minutes."}), 400
+        changes["estimate_minutes"] = estimate
+    if not changes:
+        return jsonify({"error": "Nothing to update."}), 400
+    changes["updated_on"] = today
 
+    assignments = ", ".join(f"{column} = ?" for column in changes)
     with get_connection() as connection:
         cursor = connection.execute(
-            f"UPDATE tasks SET status = ? WHERE id = ? AND project_id IN ({OWNED_PROJECTS})",
-            (status, task_id, user["id"]),
+            f"UPDATE tasks SET {assignments} WHERE id = ? AND project_id IN ({OWNED_PROJECTS})",
+            (*changes.values(), task_id, user["id"]),
         )
         if cursor.rowcount == 0:
             return jsonify({"error": "Task not found."}), 404
         row = connection.execute(
-            """
-            SELECT id, project_id, title, description, status
-            FROM tasks WHERE id = ?
-            """,
+            TASK_SELECT + " WHERE tasks.id = ?",
             (task_id,),
         ).fetchone()
         return jsonify(task_from_row(row))

@@ -8,6 +8,12 @@ export function escapeHtml(value) {
   );
 }
 
+// The browser's local calendar date as YYYY-MM-DD, so "today" matches the user's day.
+export function localDate(now = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 export function showError(error) {
   window.alert(error.message);
 }

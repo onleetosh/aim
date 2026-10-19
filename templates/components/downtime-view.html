@@ -1,0 +1,48 @@
+<!-- Downtime summary and logging, with charts and entry history on demand. -->
+<section class="workspace-section" id="downtime-view" aria-labelledby="downtime-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Time lost</p>
+      <h3 id="downtime-heading">Downtime</h3>
+    </div>
+    <label class="time-range">Range
+      <select id="downtime-range">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="time-summary" id="downtime-summary"></div>
+
+  <details class="workspace-details workspace-details-nested">
+    <summary>Log downtime</summary>
+    <div class="workspace-details-content">
+      <form class="time-form" id="downtime-form">
+        <label>Date <input type="date" name="date" required></label>
+        <label>Minutes <input type="number" name="minutes" min="1" max="1440" required></label>
+        <label class="time-wide">Reason <input type="text" name="reason" maxlength="60" placeholder="e.g. blocked, waiting, distraction"></label>
+        <label class="time-wide">Note <input type="text" name="note" maxlength="300"></label>
+        <button class="primary-button" type="submit">Add entry</button>
+      </form>
+    </div>
+  </details>
+
+  <details class="time-panel workspace-details">
+    <summary>View reasons, daily downtime, and recent entries</summary>
+    <div class="workspace-details-content">
+      <div class="time-panel">
+        <h3>Reasons</h3>
+        <div id="downtime-reasons"></div>
+      </div>
+      <div class="time-panel">
+        <h3>Daily downtime</h3>
+        <div class="time-chart" id="downtime-chart"></div>
+      </div>
+      <div class="time-panel">
+        <h3>Recent entries</h3>
+        <div id="downtime-entries"></div>
+      </div>
+    </div>
+  </details>
+</section>

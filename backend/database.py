@@ -111,6 +111,8 @@ def initialize_database():
                 )
                 """
             )
+            # Completion dates feed the dashboard's momentum measures.
+            connection.execute("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS completed_on TEXT")
             return
         connection.raw.executescript(
             """
@@ -173,6 +175,65 @@ def initialize_database():
                 "ALTER TABLE projects ADD COLUMN user_id INTEGER "
                 "REFERENCES users(id) ON DELETE CASCADE"
             )
+        task_column_names = [
+            row["name"] for row in connection.execute("PRAGMA table_info(tasks)")
+        ]
+        if "completed_on" not in task_column_names:
+            connection.execute("ALTER TABLE tasks ADD COLUMN completed_on TEXT")
+
+
+def add_task_column(connection, name, definition):
+    if connection.postgres:
+        connection.execute(f"ALTER TABLE tasks ADD COLUMN IF NOT EXISTS {name} {definition}")
+        return
+    existing = [row["name"] for row in connection.execute("PRAGMA table_info(tasks)")]
+    if name not in existing:
+        connection.execute(f"ALTER TABLE tasks ADD COLUMN {name} {definition}")
+
+
+def initialize_tracking_tables():
+    with get_connection() as connection:
+        key = "SERIAL PRIMARY KEY" if connection.postgres else "INTEGER PRIMARY KEY AUTOINCREMENT"
+        # updated_on drives stale-work detection; estimate_minutes drives plan accuracy.
+        add_task_column(connection, "updated_on", "TEXT")
+        add_task_column(connection, "estimate_minutes", "INTEGER")
+        connection.execute(
+            "UPDATE tasks SET updated_on = substr(CAST(created_at AS TEXT), 1, 10) "
+            "WHERE updated_on IS NULL"
+        )
+        connection.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS work_sessions (
+                id {key},
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                task_id INTEGER REFERENCES tasks(id) ON DELETE SET NULL,
+                entry_date TEXT NOT NULL,
+                minutes INTEGER NOT NULL CHECK(minutes > 0),
+                note TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
+        connection.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS user_settings (
+                id {key},
+                user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+                available_minutes_per_day INTEGER NOT NULL DEFAULT 480
+            )
+            """
+        )
+        connection.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS downtime_entries (
+                id {key},
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                entry_date TEXT NOT NULL,
+                minutes INTEGER NOT NULL CHECK(minutes > 0),
+                reason TEXT NOT NULL DEFAULT '',
+                note TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
 
 
 def integrity_errors():

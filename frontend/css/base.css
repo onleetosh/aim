@@ -1,16 +1,21 @@
 /* Shared design tokens and browser-wide defaults. */
 :root {
-  --ink: #17231f;
-  --muted: #6c7973;
-  --line: #dfe6e1;
+  --ink: #202a22;
+  --muted: #667168;
+  --line: #dfe5dc;
   --surface: #ffffff;
-  --canvas: #f5f7f4;
-  --green: #2b6555;
-  --green-dark: #214d41;
-  --mint: #dceee6;
-  --yellow: #f7e8ae;
-  --lavender: #e9e5f5;
-  --blue: #dcebf0;
+  --canvas: #f7f8f3;
+  --green: #287448;
+  --green-dark: #1e5b38;
+  --mint: #e2f1e6;
+  --yellow: #f4d35e;
+  --yellow-soft: #fff3c4;
+  --yellow-ink: #695200;
+  --red: #b83d37;
+  --red-dark: #96302c;
+  --red-soft: #fce8e6;
+  --lavender: var(--red-soft);
+  --blue: var(--yellow-soft);
   --shadow: 0 10px 30px rgba(26, 47, 39, .07);
 }
 
@@ -18,6 +23,7 @@
 body { margin: 0; color: var(--ink); background: var(--canvas); font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
 h1, h2, h3, p { margin-top: 0; }
 h1 { font: 400 clamp(30px, 4vw, 45px)/1.1 Georgia, serif; margin-bottom: 0; letter-spacing: -.03em; }
 h2 { font: 400 clamp(24px, 3vw, 32px)/1.2 Georgia, serif; margin-bottom: 0; letter-spacing: -.025em; }

@@ -3,6 +3,7 @@ import { statuses, state, selectedProject, detailProjectId, setSelectedProject, 
 import { apiRequest, loadState, moveTask } from "./api.js";
 import { $, escapeHtml, runAction } from "./utils.js";
 import { startDrag, initializeDragDrop } from "./drag-drop.js";
+import { openEditTaskModal } from "./modals.js";
 
 export function render() {
   // Rebuild each view from state after an API or user action changes data.
@@ -10,21 +11,20 @@ export function render() {
   renderBoard();
   renderProjects();
   renderMomentum();
-  populateProjectSelect();
   renderProjectDetail();
 }
 
 function renderProjectFilters() {
-  const strip = $("#goal-strip");
-  strip.innerHTML = "";
-  [{ id: "all", title: "All tasks" }, ...state.projects].forEach((project) => {
-    const button = document.createElement("button");
-    button.className = `goal-filter${selectedProject === project.id ? " active" : ""}`;
-    button.type = "button";
-    button.textContent = project.title;
-    button.addEventListener("click", () => { setSelectedProject(project.id); render(); });
-    strip.append(button);
+  const filter = $("#project-filter");
+  filter.innerHTML = '<option value="all">All projects</option>';
+  state.projects.forEach((project) => {
+    const option = document.createElement("option");
+    option.value = project.id;
+    option.textContent = project.title;
+    filter.append(option);
   });
+  filter.value = state.projects.some((project) => project.id === selectedProject) ? selectedProject : "all";
+  filter.onchange = () => { setSelectedProject(filter.value === "all" ? "all" : Number(filter.value)); render(); };
 }
 
 function renderBoard() {
@@ -55,8 +55,9 @@ export function createTaskCard(task) {
   card.dataset.taskId = task.id;
   card.addEventListener("pointerdown", (event) => startDrag(event, card, task.id, "pointer"));
   card.addEventListener("mousedown", (event) => startDrag(event, card, task.id, "mouse"));
-  card.innerHTML = `<h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}<div class="task-meta"><span>${project ? escapeHtml(project.title) : "No project"}</span><span>${task.status === "done" ? "Complete" : ""}</span></div><div class="task-actions">${task.status !== "done" ? `<button type="button" data-next="${task.id}">Move to ${nextStatus.label}</button>` : ""}<button type="button" data-delete="${task.id}" aria-label="Delete ${escapeHtml(task.title)}">Delete</button></div>`;
+  card.innerHTML = `<h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}<div class="task-meta"><span>${project ? escapeHtml(project.title) : "No project"}</span><span>${task.status === "done" ? "Complete" : ""}</span></div>${task.estimateMinutes || task.loggedMinutes ? `<p class="task-time">${task.estimateMinutes ? `Est ${task.estimateMinutes}m` : "No estimate"} · ${task.loggedMinutes || 0}m logged</p>` : ""}  <div class="task-actions">${task.status !== "done" ? `<button type="button" data-next="${task.id}">Move to ${nextStatus.label}</button>` : ""}<button type="button" data-edit="${task.id}" aria-label="Edit ${escapeHtml(task.title)}">Edit</button><button type="button" data-delete="${task.id}" aria-label="Delete ${escapeHtml(task.title)}">Delete</button></div>`;
   card.querySelector("[data-next]")?.addEventListener("click", async () => runAction(() => moveTask(task.id, nextStatus.id)));
+    card.querySelector("[data-edit]").addEventListener("click", () => openEditTaskModal(task));
   card.querySelector("[data-delete]").addEventListener("click", async () => runAction(async () => {
     await apiRequest(`/api/tasks/${task.id}`, { method: "DELETE" });
     await loadState();
@@ -139,6 +140,9 @@ export function showView(view) {
   $("#board-view").classList.toggle("hidden", view !== "board");
   $("#goals-view").classList.toggle("hidden", view !== "goals");
   $("#project-detail-view").classList.toggle("hidden", view !== "project-detail");
+  $("#dashboard-view").classList.toggle("hidden", view !== "dashboard");
+  $("#time-workspace").classList.toggle("hidden", view !== "focus");
+  $("#analytics-workspace").classList.toggle("hidden", view !== "analytics");
 }
 
 function renderMomentum() {
@@ -149,10 +153,4 @@ function renderMomentum() {
   $("#momentum-bar").style.width = `${percent}%`;
   $("#completed-count").textContent = complete;
   $("#total-count").textContent = total;
-}
-
-function populateProjectSelect() {
-  $("#task-goal").innerHTML = state.projects.length
-    ? state.projects.map((project) => `<option value="${project.id}">${escapeHtml(project.title)}</option>`).join("")
-    : "<option value=\"\">No project yet</option>";
 }

@@ -1,0 +1,47 @@
+<!-- Suggestions and a practical plan appear before optional history and comparisons. -->
+<section class="workspace-section" id="insights-view" aria-labelledby="insights-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Recommended based on your recent activity</p>
+      <h2 id="insights-heading">Progress</h2>
+    </div>
+  </div>
+  <p class="time-hint" id="insights-limit"></p>
+
+  <div class="time-panel time-block">
+    <h3>Suggested next steps</h3>
+    <div id="insights-recommendations"></div>
+  </div>
+
+  <div class="time-panel time-block">
+    <h3>A realistic plan for today</h3>
+    <div id="insights-plan"></div>
+  </div>
+
+  <details class="time-panel workspace-details">
+    <summary>Explore patterns and compare periods</summary>
+    <div class="workspace-details-content">
+      <div class="time-panel">
+        <h3>Worth resuming</h3>
+        <div id="insights-resume"></div>
+      </div>
+
+      <div class="time-panel">
+        <h3>Recurring patterns</h3>
+        <div id="insights-patterns"></div>
+      </div>
+
+      <div class="time-panel">
+        <h3>Compare two periods</h3>
+        <form class="time-form" id="compare-form">
+          <label>Period A start <input type="date" id="compare-a-start" required></label>
+          <label>A end <input type="date" id="compare-a-end" required></label>
+          <label>Period B start <input type="date" id="compare-b-start" required></label>
+          <label>B end <input type="date" id="compare-b-end" required></label>
+          <button class="primary-button" type="submit">Compare</button>
+        </form>
+        <div id="insights-compare"></div>
+      </div>
+    </div>
+  </details>
+</section>

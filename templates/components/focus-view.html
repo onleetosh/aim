@@ -1,0 +1,46 @@
+<!-- Work-session summary and logging, with daily charts and history on demand. -->
+<section class="workspace-section" id="focus-view" aria-labelledby="focus-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Time spent working</p>
+      <h3 id="focus-heading">Focus sessions</h3>
+    </div>
+    <label class="time-range">Range
+      <select id="focus-range">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="time-summary" id="focus-summary"></div>
+
+  <details class="workspace-details workspace-details-nested">
+    <summary>Log a work session</summary>
+    <div class="workspace-details-content">
+      <form class="time-form" id="focus-form">
+        <label>Date <input type="date" name="date" required></label>
+        <label>Minutes <input type="number" name="minutes" min="1" max="1440" required></label>
+        <label class="time-wide">Task (optional)
+          <select name="taskId"><option value="">No specific task</option></select>
+        </label>
+        <label class="time-wide">Note <input type="text" name="note" maxlength="300"></label>
+        <button class="primary-button" type="submit">Add session</button>
+      </form>
+    </div>
+  </details>
+
+  <details class="time-panel workspace-details">
+    <summary>View daily focus and recent sessions</summary>
+    <div class="workspace-details-content">
+      <div class="time-panel">
+        <h3>Daily focus</h3>
+        <div class="time-chart" id="focus-chart"></div>
+      </div>
+      <div class="time-panel">
+        <h3>Recent sessions</h3>
+        <div id="focus-entries"></div>
+      </div>
+    </div>
+  </details>
+</section>

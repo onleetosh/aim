@@ -1,6 +1,6 @@
 /* Page shell, sidebar navigation, and shared controls. */
 .app-shell { display: flex; min-height: 100vh; }
-.sidebar { width: 260px; background: #e9f1ec; display: flex; flex-direction: column; padding: 30px 22px 24px; }
+.sidebar { width: 260px; background: var(--mint); display: flex; flex-direction: column; padding: 30px 22px 24px; }
 .brand { color: var(--ink); display: flex; gap: 12px; align-items: center; text-decoration: none; }
 .brand-mark { display: grid; place-items: center; width: 39px; height: 39px; background: var(--green); color: white; border-radius: 12px; font: 700 20px Georgia, serif; }
 .brand strong { display: block; font: 700 20px Georgia, serif; letter-spacing: .05em; }
@@ -15,7 +15,7 @@
 .momentum-value { display: flex; justify-content: space-between; align-items: baseline; }
 .momentum-value strong { color: var(--green); font: 700 26px Georgia, serif; }
 .momentum-value span, .momentum-card p { color: var(--muted); font-size: 12px; }
-.progress-track { background: #d3dfd8; border-radius: 20px; height: 7px; margin: 12px 0 8px; overflow: hidden; }
+.progress-track { background: #cfddcf; border-radius: 20px; height: 7px; margin: 12px 0 8px; overflow: hidden; }
 .progress-track span { display: block; height: 100%; width: 0; background: var(--green); border-radius: inherit; transition: width .3s ease; }
 .momentum-card p { margin: 0; }
 .sidebar-note { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 16px 2px 0; }
@@ -25,7 +25,7 @@
 .primary-button { color: white; background: var(--green); }
 .primary-button:hover { background: var(--green-dark); transform: translateY(-1px); }
 .primary-button span { font-size: 19px; line-height: 0; vertical-align: -1px; margin-right: 5px; }
-.secondary-button { background: #eef2ef; color: var(--ink); }
+.secondary-button { background: var(--yellow-soft); color: var(--ink); }
 .text-button { border: 0; background: transparent; color: var(--green); font-weight: 700; padding: 8px 0; }
 .text-button:hover { color: var(--green-dark); text-decoration: underline; }
 .view { margin-top: 57px; }

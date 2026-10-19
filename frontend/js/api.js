@@ -1,7 +1,7 @@
 // Keep transport details out of rendering and form modules.
 import { state } from "./config.js";
 import { render } from "./render.js";
-import { showError } from "./utils.js";
+import { localDate, showError } from "./utils.js";
 
 const LOCAL_STORAGE_KEY = "aim-file-mode-state";
 // Opening index.html directly uses localStorage because fetch cannot reach Flask.
@@ -65,7 +65,9 @@ function localRequest(path, options = {}) {
   if (taskMatch && options.method === "PATCH") {
     const task = localState.tasks.find((item) => item.id === taskMatch[1]);
     if (!task) throw new Error("Task not found.");
-    task.status = body.status;
+    if (body.status !== undefined) task.status = body.status;
+    if (body.title !== undefined) task.title = String(body.title).trim();
+    if (body.description !== undefined) task.description = String(body.description).trim();
     saveLocalState(localState);
     return task;
   }
@@ -96,7 +98,10 @@ export async function loadState() {
 export async function moveTask(taskId, status) {
   const { runAction } = await import("./utils.js");
   await runAction(async () => {
-    await apiRequest(`/api/tasks/${taskId}`, { method: "PATCH", body: JSON.stringify({ status }) });
+    await apiRequest(`/api/tasks/${taskId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status, today: localDate() })
+    });
     await loadState();
   });
 }

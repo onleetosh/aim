@@ -6,8 +6,8 @@
 .modal-header h2 { font-size: 27px; }
 .close-button { background: transparent; border: 0; color: var(--muted); font-size: 25px; line-height: 1; }
 .modal label { display: block; font-size: 13px; font-weight: 700; margin: 15px 0 6px; }
-.modal label span { color: #a84f3e; }
+.modal label span { color: var(--red-dark); }
 .modal input, .modal textarea, .modal select { border: 1px solid var(--line); border-radius: 7px; color: var(--ink); outline: 0; padding: 10px 11px; width: 100%; }
 .modal textarea { resize: vertical; }
-.modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--green); box-shadow: 0 0 0 3px #dceee6; }
+.modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--mint); }
 .modal-actions { display: flex; justify-content: end; gap: 9px; margin-top: 24px; }

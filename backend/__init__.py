@@ -7,7 +7,12 @@ from pathlib import Path
 from flask import Flask
 
 from .auth import auth
-from .database import initialize_database
+from .database import initialize_database, initialize_tracking_tables
+from .analytics import analytics_api
+from .insights import insights_api
+from .dashboard import dashboard_api
+from .downtime import downtime_api
+from .focus import focus_api
 from .routes import api
 
 
@@ -34,5 +39,11 @@ def create_app():
     )
     app.register_blueprint(auth)
     app.register_blueprint(api)
+    app.register_blueprint(downtime_api)
+    app.register_blueprint(focus_api)
+    app.register_blueprint(dashboard_api)
+    app.register_blueprint(analytics_api)
+    app.register_blueprint(insights_api)
     initialize_database()
+    initialize_tracking_tables()
     return app

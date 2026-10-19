@@ -1,17 +1,17 @@
 /* Board filters, columns, task cards, and drag/drop states. */
-.goal-strip { display: flex; gap: 8px; margin: 27px 0 21px; overflow-x: auto; padding-bottom: 3px; }
-.goal-filter { background: transparent; border: 1px solid var(--line); border-radius: 30px; color: var(--muted); padding: 7px 14px; white-space: nowrap; }
-.goal-filter.active, .goal-filter:hover { border-color: var(--green); color: var(--green); background: #edf6f1; }
+.project-filter { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+.project-filter select { min-width: 180px; border: 1px solid var(--line); border-radius: 6px; padding: 8px; font: inherit; color: var(--ink); background: white; }
 .board { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 16px; }
 .column { min-height: 370px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.5); overflow: hidden; }
 .column.drop-target, .project-task-group.drop-target { border-color: var(--green); box-shadow: 0 0 0 3px var(--mint); }
 .column-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; border-bottom: 1px solid var(--line); }
 .column-header h3 { margin: 0; font-size: 13px; }
 .count { min-width: 23px; border-radius: 15px; padding: 1px 6px; background: var(--line); color: var(--muted); font-size: 12px; text-align: center; }
-.column:nth-child(1) .column-header { background: var(--yellow); }
-.column:nth-child(2) .column-header { background: var(--mint); }
-.column:nth-child(3) .column-header { background: var(--lavender); }
-.column:nth-child(4) .column-header { background: var(--blue); }
+.column:nth-child(1) .column-header { background: var(--mint); color: var(--green-dark); }
+.column:nth-child(2) .column-header { background: var(--yellow-soft); color: var(--yellow-ink); }
+.column:nth-child(3) .column-header { background: var(--red-soft); color: var(--red-dark); }
+.column:nth-child(4) .column-header { background: var(--green); color: white; }
+.column:nth-child(4) .count { background: rgba(255,255,255,.22); color: white; }
 .column-body { padding: 10px; display: grid; gap: 9px; align-content: start; }
 .task-card { background: var(--surface); border: 1px solid #e6ebe7; border-radius: 9px; box-shadow: 0 3px 9px rgba(26,47,39,.04); padding: 14px; touch-action: none; user-select: none; cursor: grab; }
 .task-card.dragging { cursor: grabbing; opacity: .45; }
@@ -22,6 +22,6 @@
 .task-actions button { border: 1px solid var(--line); background: white; border-radius: 5px; color: var(--muted); font-size: 11px; padding: 4px 8px; }
 .task-actions button:hover { color: var(--green); border-color: var(--green); }
 .empty-state { color: var(--muted); padding: 35px 10px; text-align: center; }
-.empty-icon { color: #adc8ba; font-size: 24px; }
+.empty-icon { color: var(--green); font-size: 24px; }
 .empty-state h3 { color: var(--ink); font-size: 14px; margin-top: 8px; }
 .empty-state p { font-size: 12px; margin-bottom: 4px; }

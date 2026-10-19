@@ -1,0 +1,56 @@
+<!-- Progress overview with detailed charts and breakdowns available on demand. -->
+<section class="workspace-section" id="analytics-view" aria-labelledby="analytics-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Your recent momentum</p>
+      <h3 id="analytics-heading">Progress over time</h3>
+    </div>
+    <label class="time-range">Summary period
+      <select id="analytics-period">
+        <option value="weekly" selected>Weekly (8 weeks)</option>
+        <option value="monthly">Monthly (6 months)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="time-summary" id="analytics-comparison"></div>
+
+  <details class="time-panel workspace-details">
+    <summary>View progress trends and breakdowns</summary>
+    <div class="workspace-details-content">
+      <div class="dash-grid">
+        <div class="time-panel">
+          <h3>Tasks completed</h3>
+          <div class="time-chart" id="analytics-completed"></div>
+        </div>
+        <div class="time-panel">
+          <h3>Completion rate</h3>
+          <div class="time-chart" id="analytics-rate"></div>
+          <p class="time-hint">Completed ÷ tasks in play during the period (created by then and still open, or finished in it). Done tasks without a completion date are not counted.</p>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="time-panel">
+          <h3>Focus vs downtime</h3>
+          <div class="time-chart" id="analytics-time"></div>
+          <p class="time-legend"><span class="dot productive"></span> Focus <span class="dot downtime"></span> Downtime</p>
+        </div>
+        <div class="time-panel">
+          <h3>Planned vs actual time</h3>
+          <div id="analytics-plan"></div>
+        </div>
+      </div>
+
+      <div class="time-panel time-block">
+        <h3>Downtime by weekday and category</h3>
+        <div id="analytics-patterns"></div>
+      </div>
+
+      <div class="time-panel">
+        <h3>Stalled work</h3>
+        <div id="analytics-stalled"></div>
+      </div>
+    </div>
+  </details>
+</section>

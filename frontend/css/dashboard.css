@@ -1,0 +1,61 @@
+/* Dashboard layout and insight styling; reuses panel and bar styles from downtime.css. */
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin: 16px 0; }
+.dashboard-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.time-panel .eyebrow { margin-bottom: 4px; }
+.dash-project { margin-bottom: 14px; }
+.dash-project-head { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 6px; }
+.dash-project small { color: var(--muted); font-size: 11px; }
+.reason-track .done-fill { background: var(--green); }
+.dash-tag { border-radius: 10px; font-size: 11px; font-weight: 700; padding: 2px 8px; background: var(--canvas); color: var(--muted); white-space: nowrap; }
+.dash-tag.moving, .dash-tag.complete { background: var(--mint); color: var(--green-dark); }
+.dash-tag.in-progress { background: var(--yellow-soft); color: var(--yellow-ink); }
+.dash-tag.stalled { background: var(--red-soft); color: var(--red-dark); }
+.dash-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.dash-status-row { display: flex; justify-content: space-between; text-align: center; }
+.dash-status-row strong { display: block; font: 700 20px Georgia, serif; color: var(--green); }
+.dash-status-row small { color: var(--muted); font-size: 11px; }
+.bar.done { background: var(--green); }
+.dash-insights { display: grid; gap: 8px; margin-bottom: 14px; }
+.dash-insight { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; border-radius: 8px; padding: 10px 12px; background: var(--canvas); }
+.dash-insight span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.dash-insight p { margin: 0; font-size: 13px; }
+.dash-insight.help { background: var(--mint); }
+.dash-insight.hinder { background: var(--red-soft); color: var(--red-dark); }
+.dash-insight.next { background: var(--yellow-soft); color: var(--yellow-ink); }
+#dash-awareness h4, #dash-action h4 { margin: 12px 0 8px; font-size: 13px; }
+.stale-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); }
+.stale-row small { color: var(--muted); margin-left: 6px; }
+.account-bar { background: var(--canvas); border-radius: 6px; display: flex; height: 18px; overflow: hidden; }
+.account-bar .focus { background: var(--green); }
+.account-bar .downtime { background: var(--red); }
+.dot.unrecorded { background: var(--canvas); border: 1px solid var(--line); }
+.dash-settings { margin-top: 14px; grid-template-columns: 1fr auto; }
+.recommendation { border-radius: 12px; padding: 18px 20px; margin-top: 24px; background: var(--mint); border: 1px solid var(--line); }
+.recommendation h3 { margin: 0 0 8px; }
+.recommendation p:not(.eyebrow) { margin: 0 0 4px; font-size: 14px; }
+.recommendation small { color: var(--muted); display: block; margin-top: 10px; font-size: 11px; }
+.recommendation.rest, .recommendation.reduce { background: var(--yellow-soft); }
+.recommendation.focus, .recommendation.start { background: var(--mint); }
+#insights-recommendations .recommendation { margin-top: 10px; padding: 14px 16px; }
+.recommendation.resume { background: var(--yellow-soft); }
+.recommendation.data { background: var(--canvas); }
+.stale-row small { display: block; }
+.task-time { color: var(--muted); font-size: 11px; margin: 4px 0 0; }
+.summary-card small { color: var(--muted); display: block; font-size: 11px; margin-top: 4px; }
+.delta-good { color: var(--green); font-weight: 700; }
+.delta-warn { color: var(--red-dark); font-weight: 700; }
+.bar-pair { display: flex; align-items: flex-end; gap: 2px; width: 100%; flex: 1; }
+.bar-pair .bar { flex: 1; width: auto; border-radius: 2px 2px 0 0; }
+.heat-table { border-collapse: collapse; font-size: 12px; width: 100%; }
+.heat-table th, .heat-table td { padding: 6px; text-align: center; }
+.heat-table tbody th { text-align: left; font-weight: 600; white-space: nowrap; }
+.heat-table th small { color: var(--muted); font-weight: 400; }
+.heat-table thead th { color: var(--muted); font-size: 11px; }
+.heat-table td { background: rgba(244, 211, 94, calc(var(--heat, 0) * .75)); border: 1px solid var(--canvas); }
+.heat-total td, .heat-total th { border-top: 1px solid var(--line); font-weight: 700; }
+.heat-total td { background: none; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 4px 0 10px; }
+.dot.productive { background: var(--green); }
+.dot.downtime { background: var(--red); }
+.time-legend { color: var(--muted); font-size: 12px; margin: 12px 0 0; }
+.time-legend .dot:first-child { margin-left: 0; }
