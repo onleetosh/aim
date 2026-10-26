@@ -1,9 +1,0 @@
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5099
-Press CTRL+C to quit
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 622-987-047
-127.0.0.1 - - [15/Oct/2026 13:57:34] "GET / HTTP/1.1" 200 -
-make: *** [Makefile:32: run] Error -1
- * Detected change in 'C:\\Users\\toshs\\Lehman\\fall_26\\cmp_343\\github\\project1\\aim\\backend\\__init__.py', reloading
