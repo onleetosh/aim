@@ -122,6 +122,9 @@ def update_task(user, task_id):
             return jsonify({"error": "Invalid task status."}), 400
         changes["status"] = data["status"]
         changes["completed_on"] = today if data["status"] == "done" else None
+        changes["archived"] = 0
+    if data.get("archived") is True:
+        changes["archived"] = 1
     if "title" in data:
         title = str(data["title"]).strip()
         if not title:

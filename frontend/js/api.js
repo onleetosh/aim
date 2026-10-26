@@ -65,7 +65,8 @@ function localRequest(path, options = {}) {
   if (taskMatch && options.method === "PATCH") {
     const task = localState.tasks.find((item) => item.id === taskMatch[1]);
     if (!task) throw new Error("Task not found.");
-    if (body.status !== undefined) task.status = body.status;
+    if (body.status !== undefined) { task.status = body.status; task.archived = false; }
+    if (body.archived === true) task.archived = true;
     if (body.title !== undefined) task.title = String(body.title).trim();
     if (body.description !== undefined) task.description = String(body.description).trim();
     saveLocalState(localState);
@@ -93,6 +94,14 @@ export async function loadState() {
   } catch (error) {
     showError(error);
   }
+}
+
+export async function archiveTask(taskId) {
+  await apiRequest(`/api/tasks/${taskId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ archived: true, today: localDate() })
+  });
+  await loadState();
 }
 
 export async function moveTask(taskId, status) {

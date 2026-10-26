@@ -1,6 +1,6 @@
 // Rendering functions turn application state into board and project DOM nodes.
 import { statuses, state, selectedProject, detailProjectId, setSelectedProject, setDetailProjectId } from "./config.js";
-import { apiRequest, loadState, moveTask } from "./api.js";
+import { apiRequest, loadState, moveTask, archiveTask } from "./api.js";
 import { $, escapeHtml, runAction } from "./utils.js";
 import { startDrag, initializeDragDrop } from "./drag-drop.js";
 import { openEditTaskModal } from "./modals.js";
@@ -31,7 +31,8 @@ function renderBoard() {
   const board = $("#board");
   board.innerHTML = "";
   statuses.forEach((status) => {
-    const tasks = state.tasks.filter((task) => task.status === status.id && (selectedProject === "all" || task.projectId === selectedProject));
+    // Archived tasks leave the board but remain under Complete in their project.
+    const tasks = state.tasks.filter((task) => task.status === status.id && !task.archived && (selectedProject === "all" || task.projectId === selectedProject));
     if (status.id === "new") return;
     const column = document.createElement("section");
     column.className = "column";
@@ -51,12 +52,13 @@ export function createTaskCard(task) {
   const project = state.projects.find((item) => item.id === task.projectId);
   const nextStatus = statuses[Math.min(statuses.findIndex((item) => item.id === task.status) + 1, statuses.length - 1)];
   card.className = "task-card";
+  const isDone = task.status === "done";
   card.draggable = false;
   card.dataset.taskId = task.id;
   card.addEventListener("pointerdown", (event) => startDrag(event, card, task.id, "pointer"));
   card.addEventListener("mousedown", (event) => startDrag(event, card, task.id, "mouse"));
-  card.innerHTML = `<h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}<div class="task-meta"><span>${project ? escapeHtml(project.title) : "No project"}</span><span>${task.status === "done" ? "Complete" : ""}</span></div>${task.estimateMinutes || task.loggedMinutes ? `<p class="task-time">${task.estimateMinutes ? `Est ${task.estimateMinutes}m` : "No estimate"} · ${task.loggedMinutes || 0}m logged</p>` : ""}  <div class="task-actions">${task.status !== "done" ? `<button type="button" data-next="${task.id}">Move to ${nextStatus.label}</button>` : ""}<button type="button" data-edit="${task.id}" aria-label="Edit ${escapeHtml(task.title)}">Edit</button><button type="button" data-delete="${task.id}" aria-label="Delete ${escapeHtml(task.title)}">Delete</button></div>`;
-  card.querySelector("[data-next]")?.addEventListener("click", async () => runAction(() => moveTask(task.id, nextStatus.id)));
+  card.innerHTML = `<h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}<div class="task-meta"><span>${project ? escapeHtml(project.title) : "No project"}</span><span>${task.archived ? "Archived" : task.status === "done" ? "Complete" : ""}</span></div>${task.estimateMinutes || task.loggedMinutes ? `<p class="task-time">${task.estimateMinutes ? `Est ${task.estimateMinutes}m` : "No estimate"} · ${task.loggedMinutes || 0}m logged</p>` : ""}  <div class="task-actions">${task.archived ? "" : `<button type="button" data-next="${task.id}">${isDone ? "Archive" : `Move to ${nextStatus.label}`}</button>`}<button type="button" data-edit="${task.id}" aria-label="Edit ${escapeHtml(task.title)}">Edit</button><button type="button" data-delete="${task.id}" aria-label="Delete ${escapeHtml(task.title)}">Delete</button></div>`;
+  card.querySelector("[data-next]")?.addEventListener("click", async () => runAction(() => isDone ? archiveTask(task.id) : moveTask(task.id, nextStatus.id)));
     card.querySelector("[data-edit]").addEventListener("click", () => openEditTaskModal(task));
   card.querySelector("[data-delete]").addEventListener("click", async () => runAction(async () => {
     await apiRequest(`/api/tasks/${task.id}`, { method: "DELETE" });

@@ -197,6 +197,8 @@ def initialize_tracking_tables():
         # updated_on drives stale-work detection; estimate_minutes drives plan accuracy.
         add_task_column(connection, "updated_on", "TEXT")
         add_task_column(connection, "estimate_minutes", "INTEGER")
+        # Archived tasks stay done but are hidden from the kanban board.
+        add_task_column(connection, "archived", "INTEGER NOT NULL DEFAULT 0")
         connection.execute(
             "UPDATE tasks SET updated_on = substr(CAST(created_at AS TEXT), 1, 10) "
             "WHERE updated_on IS NULL"
