@@ -54,12 +54,12 @@ def create_entry(user):
     with get_connection() as connection:
         cursor = connection.execute(
             "INSERT INTO downtime_entries (user_id, entry_date, minutes, reason, note) "
-            "VALUES (?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?) RETURNING id",
             (user["id"], entry_date, minutes, reason, note),
         )
         row = connection.execute(
             f"SELECT {ENTRY_COLUMNS} FROM downtime_entries WHERE id = ?",
-            (cursor.lastrowid,),
+            (cursor.fetchone()["id"],),
         ).fetchone()
         return jsonify(entry_from_row(row)), 201
 

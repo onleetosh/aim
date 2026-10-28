@@ -51,12 +51,12 @@ def create_project(user):
 
     with get_connection() as connection:
         cursor = connection.execute(
-            "INSERT INTO projects (title, description, user_id) VALUES (?, ?, ?)",
+            "INSERT INTO projects (title, description, user_id) VALUES (?, ?, ?) RETURNING id",
             (title, description, user["id"]),
         )
         row = connection.execute(
             "SELECT id, title, description FROM projects WHERE id = ?",
-            (cursor.lastrowid,),
+            (cursor.fetchone()["id"],),
         ).fetchone()
         return jsonify(project_from_row(row)), 201
 
@@ -99,12 +99,13 @@ def create_task(user):
             """
             INSERT INTO tasks (project_id, title, description, updated_on, estimate_minutes)
             VALUES (?, ?, ?, ?, ?)
+            RETURNING id
             """,
             (project_id, title, description, today, estimate),
         )
         row = connection.execute(
             TASK_SELECT + " WHERE tasks.id = ?",
-            (cursor.lastrowid,),
+            (cursor.fetchone()["id"],),
         ).fetchone()
         return jsonify(task_from_row(row)), 201
 

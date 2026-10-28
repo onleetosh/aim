@@ -70,10 +70,10 @@ def register():
     try:
         with get_connection() as connection:
             cursor = connection.execute(
-                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                "INSERT INTO users (username, password_hash) VALUES (?, ?) RETURNING id",
                 (username, generate_password_hash(password)),
             )
-            user_id = cursor.lastrowid
+            user_id = cursor.fetchone()["id"]
     except integrity_errors():
         return jsonify({"error": "That username is already taken."}), 409
 

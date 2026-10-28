@@ -87,11 +87,11 @@ def create_entry(user):
             )
         cursor = connection.execute(
             "INSERT INTO work_sessions (user_id, task_id, entry_date, minutes, note) "
-            "VALUES (?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?) RETURNING id",
             (user["id"], task_id, entry_date, minutes, note),
         )
         row = connection.execute(
-            ENTRY_SELECT + " WHERE work_sessions.id = ?", (cursor.lastrowid,)
+            ENTRY_SELECT + " WHERE work_sessions.id = ?", (cursor.fetchone()["id"],)
         ).fetchone()
         return jsonify(entry_from_row(row)), 201
 

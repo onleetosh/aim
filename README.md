@@ -138,7 +138,7 @@ There is a significant gap between understanding what matters and taking consist
 | Piece | Choice | Why |
 |---|---|---|
 | Server / API | Python / Flask | Lightweight HTTP API for the MVP |
-| Data storage | SQLite | Local relational database with no separate database server |
+| Data storage | PostgreSQL | Relational database for both local development and deployment |
 | Outside services (optional) |TBD| |
 | Hosting / deploy | TBD |  |
 
@@ -148,7 +148,7 @@ There is a significant gap between understanding what matters and taking consist
 flowchart LR
     U["User"] --> FE["React Front End"]
     FE["HTML/CSS/JavaScript"] --> API["Python / Flask API"]
-    API --> DB[("SQLite Database")]
+    API --> DB[("PostgreSQL Database")]
 
 ```
 
@@ -158,7 +158,7 @@ The Flask backend is organized as a Python package:
 app.py                 # Application entry point
 backend/
 ├── __init__.py        # Flask app factory
-├── database.py        # SQLite/PostgreSQL connection and schema
+├── database.py        # PostgreSQL connection and schema
 ├── routes.py          # Web and API endpoints
 └── serializers.py     # Database-row to JSON conversion
 ```
@@ -228,18 +228,30 @@ templates/
 
 ## 7. Running the MVP
 
-The MVP uses a Flask backend and SQLite database. Install the Python dependency and start the application:
+The app uses Flask and PostgreSQL in both development and deployment. Install
+the Python dependencies, create a local PostgreSQL database, and set
+`DATABASE_URL` to its connection string before starting the application. For
+example, in PowerShell:
 
-```bash
+```powershell
 python -m pip install -r requirements.txt
+$env:DATABASE_URL = "postgresql://aim:your-password@localhost:5432/aim"
 python app.py
 ```
 
-Or, if you have GNU `make` installed, run `make run`. It creates `.venv`, installs the dependencies, and starts the dev server. `make help` lists the other targets.
+Create the `aim` database and its database user in PostgreSQL before running
+the app. Or, if you have GNU `make` installed, set `DATABASE_URL` in your
+environment and run `make run`. It creates `.venv`, installs dependencies, and
+starts the dev server. `make help` lists the other targets.
 
-Then visit `http://localhost:5000`. You will see a login screen; choose **Create an account** to sign up. Each account has its own projects and tasks, and new accounts start empty. The server creates `aim.db` automatically and stores accounts, projects, and tasks there between sessions.
+Then visit `http://localhost:5000`. You will see a login screen; choose **Create
+an account** to sign up. Each account has its own projects and tasks, and new
+accounts start empty. The server creates the required tables in PostgreSQL on
+startup.
 
-The interface is rendered from Flask/Jinja templates. Start Flask and visit `http://localhost:5000` to load the page and use the SQLite database.
+The interface is rendered from Flask/Jinja templates. `DATABASE_URL` is
+required; the app no longer falls back to a local SQLite file. Existing data in
+`aim.db` is not migrated automatically.
 
 New tasks begin in the project's **New** group. Dragging a task into **Active** changes its status to `Ready`, placing it in the Ready board column. Dragging a task to **Complete** changes its status to `Done`; completed tasks remain available in the project detail view.
 
@@ -259,18 +271,16 @@ Render runs the app with Gunicorn and checks `/api/state` for service health.
 
 ### Persistent data
 
-Without a `DATABASE_URL` environment variable the app uses a local SQLite file
-(`aim.db`). That file is erased whenever a Render service restarts or
-redeploys, so a deployed app must use PostgreSQL:
+The app requires `DATABASE_URL` in every environment. Point it to a local
+PostgreSQL instance during development, and to a persistent PostgreSQL service
+when deployed:
 
 1. Create a free PostgreSQL database (for example at [Neon](https://neon.tech)
    or as a Render PostgreSQL instance) and copy its connection string.
 2. In the Render service, open **Environment** and add `DATABASE_URL` with that
    connection string (Render prompts for it when applying the Blueprint).
-3. Redeploy. The app creates its tables on first start, then all
-   changes persist across restarts and redeploys.
-
-Locally, leave `DATABASE_URL` unset to keep using SQLite.
+3. Redeploy. The app creates its tables on first start, then all changes persist
+   across restarts and redeploys.
 
 Login sessions are signed with `SECRET_KEY`. The Blueprint generates one for
 Render automatically; locally a random key is used, so you are logged out
