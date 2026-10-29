@@ -10,4 +10,10 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: aim
+          property: connectionString
+
+databases:
+  - name: aim-postgres
+    plan: free
