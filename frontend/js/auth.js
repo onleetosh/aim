@@ -6,14 +6,13 @@ const switchButton = document.querySelector("#auth-switch-button");
 let mode = "login";
 
 const copy = {
-  login: { eyebrow: "Welcome back", heading: "Log in", submit: "Log in", prompt: "New to A.I.M.?", switchLabel: "Create an account", autocomplete: "current-password" },
+  login: { heading: "Log in", submit: "Log in", prompt: "New to A.I.M.?", switchLabel: "Create an account", autocomplete: "current-password" },
   register: { eyebrow: "Get started", heading: "Create your account", submit: "Sign up", prompt: "Already have an account?", switchLabel: "Log in", autocomplete: "new-password" }
 };
 
 function setMode(nextMode) {
   mode = nextMode;
   const text = copy[mode];
-  document.querySelector("#auth-eyebrow").textContent = text.eyebrow;
   document.querySelector("#auth-heading").textContent = text.heading;
   submitButton.textContent = text.submit;
   document.querySelector("#auth-switch-text").textContent = text.prompt;
