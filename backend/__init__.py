@@ -1,7 +1,6 @@
 # Application factory and project-level Flask configuration.
 import os
 import secrets
-from datetime import timedelta
 from pathlib import Path
 
 from flask import Flask
@@ -31,7 +30,6 @@ def create_app():
     # is fine locally but logs everyone out whenever the server restarts.
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
-        PERMANENT_SESSION_LIFETIME=timedelta(days=14),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         # Render sets RENDER=true and serves the app over HTTPS.

@@ -45,7 +45,10 @@ def login_required(view):
 def start_session(user_id):
     session.clear()
     session["user_id"] = user_id
-    session.permanent = True
+    # Non-permanent: the cookie is dropped when the browser closes, so the
+    # login screen appears on the next visit.
+    session.permanent = False
+    session["fresh"] = True
 
 
 def credentials_from_request():

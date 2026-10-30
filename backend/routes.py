@@ -2,7 +2,7 @@
 # Every API route is scoped to the logged-in user's own projects.
 from datetime import date
 
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, session
 
 from .auth import current_user, login_required
 from .dates import parse_date, parse_int
@@ -29,7 +29,13 @@ def read_estimate(data):
 
 @api.get("/")
 def index():
-    user = current_user()
+    # Opening the app always starts at the login screen. The "fresh" flag is set
+    # by login/register and consumed by the single reload that follows it.
+    if session.pop("fresh", False):
+        user = current_user()
+    else:
+        session.clear()
+        user = None
     return render_template("index.html", username=user["username"] if user else None)
 
 

@@ -11,19 +11,20 @@ from .dates import parse_date
 
 analytics_api = Blueprint("analytics_api", __name__)
 
+# Constants for analytics calculations, such as stale task threshold, number of weeks/months to consider, and matrix categories.
 STALE_DAYS = 7
 WEEKS = 8
 MONTHS = 6
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 MATRIX_CATEGORIES = 5
 
-
+# Helper function to calculate the start date of a given month.
 def month_start(year, month):
     year += (month - 1) // 12
     month = (month - 1) % 12 + 1
     return date(year, month, 1)
 
-
+# Helper function to build time buckets for analytics, either weekly or monthly.
 def build_buckets(period, today):
     if period == "monthly":
         starts = [month_start(today.year, today.month - offset) for offset in range(MONTHS - 1, -1, -1)]
@@ -39,20 +40,22 @@ def build_buckets(period, today):
         for label, s, e in zip(labels, starts, ends)
     ]
 
-
+# Helper function to determine which bucket a given day belongs to.
 def bucket_of(buckets, day_text):
     for index, bucket in enumerate(buckets):
         if bucket["start"] <= day_text <= bucket["end"]:
             return index
     return None
 
-
+# Helper function to calculate the change between current and previous values.
 def change(current, previous):
     return {"current": current, "previous": previous, "delta": current - previous}
 
 
+# Endpoint to fetch analytics data for the logged-in user.
 @analytics_api.get("/api/analytics")
 @login_required
+# Returns analytics data based on the specified period (weekly or monthly) and the current date.
 def get_analytics(user):
     period = "monthly" if request.args.get("period") == "monthly" else "weekly"
     today = date.fromisoformat(parse_date(request.args.get("today")) or date.today().isoformat())
