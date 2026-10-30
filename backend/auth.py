@@ -15,11 +15,16 @@ MIN_PASSWORD_LENGTH = 8
 MAX_PASSWORD_LENGTH = 128
 # Checked when a username does not exist so response time doesn't reveal it.
 DUMMY_HASH = generate_password_hash("not-a-real-password")
+# Logins from before browser-session cookies lack this marker and are rejected.
+SESSION_VERSION = 2
 
 
 def current_user():
     user_id = session.get("user_id")
     if user_id is None:
+        return None
+    if session.get("v") != SESSION_VERSION:
+        session.clear()
         return None
     with get_connection() as connection:
         row = connection.execute(
@@ -48,7 +53,7 @@ def start_session(user_id):
     # Non-permanent: the cookie is dropped when the browser closes, so the
     # login screen appears on the next visit.
     session.permanent = False
-    session["fresh"] = True
+    session["v"] = SESSION_VERSION
 
 
 def credentials_from_request():
