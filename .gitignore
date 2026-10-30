@@ -1,2 +1,3 @@
 aim.db
 __pycache__/
+.env
