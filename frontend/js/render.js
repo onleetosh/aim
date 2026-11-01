@@ -3,7 +3,7 @@ import { statuses, state, selectedProject, detailProjectId, setSelectedProject, 
 import { apiRequest, loadState, moveTask, archiveTask } from "./api.js";
 import { $, escapeHtml, runAction } from "./utils.js";
 import { startDrag, initializeDragDrop } from "./drag-drop.js";
-import { openEditTaskModal } from "./modals.js";
+import { openEditTaskModal, openGoalModal } from "./modals.js";
 
 export function render() {
   // Rebuild each view from state after an API or user action changes data.
@@ -57,14 +57,10 @@ export function createTaskCard(task) {
   card.dataset.taskId = task.id;
   card.addEventListener("pointerdown", (event) => startDrag(event, card, task.id, "pointer"));
   card.addEventListener("mousedown", (event) => startDrag(event, card, task.id, "mouse"));
-  card.innerHTML = `<h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}<div class="task-meta"><span>${project ? escapeHtml(project.title) : "No project"}</span><span>${task.archived ? "Archived" : task.status === "done" ? "Complete" : ""}</span></div>${task.estimateMinutes || task.loggedMinutes ? `<p class="task-time">${task.estimateMinutes ? `Est ${task.estimateMinutes}m` : "No estimate"} · ${task.loggedMinutes || 0}m logged</p>` : ""}  <div class="task-actions">${task.archived ? "" : `<button type="button" data-next="${task.id}">${isDone ? "Archive" : `Move to ${nextStatus.label}`}</button>`}<button type="button" data-edit="${task.id}" aria-label="Edit ${escapeHtml(task.title)}">Edit</button><button type="button" data-delete="${task.id}" aria-label="Delete ${escapeHtml(task.title)}">Delete</button></div>`;
-  card.querySelector("[data-next]")?.addEventListener("click", async () => runAction(() => isDone ? archiveTask(task.id) : moveTask(task.id, nextStatus.id)));
+  card.innerHTML = `<h3>${escapeHtml(task.title)}</h3>${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}<div class="task-meta"><span>${project ? escapeHtml(project.title) : "No project"}</span><span>${task.archived ? "Archived" : task.status === "done" ? "Complete" : ""}</span></div>${task.estimateMinutes || task.loggedMinutes ? `<p class="task-time">${task.estimateMinutes ? `Est ${task.estimateMinutes}m` : "No estimate"} · ${task.loggedMinutes || 0}m logged</p>` : ""}  <div class="task-actions">${task.archived ? "" : `<button type="button" data-next="${task.id}">${isDone ? "Archive" : `Move to ${nextStatus.label}`}</button>`}  <button type="button" data-edit="${task.id}" aria-label="Edit ${escapeHtml(task.title)}">Edit</button></div>`;
+    card.querySelector("[data-next]")?.addEventListener("click", async () => runAction(() => isDone ? archiveTask(task.id) : moveTask(task.id, nextStatus.id)));
     card.querySelector("[data-edit]").addEventListener("click", () => openEditTaskModal(task));
-  card.querySelector("[data-delete]").addEventListener("click", async () => runAction(async () => {
-    await apiRequest(`/api/tasks/${task.id}`, { method: "DELETE" });
-    await loadState();
-  }));
-  return card;
+    return card;
 }
 
 function renderProjects() {
@@ -79,24 +75,15 @@ function renderProjects() {
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${project.title} project`);
-    card.innerHTML = `<h3>${escapeHtml(project.title)}</h3><p>${escapeHtml(project.description || "A project without a description. Start with one small step.")}</p><div class="goal-progress"><span>${completed} of ${tasks.length} tasks complete</span><strong>${percent}%</strong></div><div class="progress-track"><span style="width:${percent}%"></span></div><div class="project-actions"><button type="button" class="delete-project-button" data-delete-project="${project.id}">Delete project</button></div>`;
-    card.addEventListener("click", () => openProject(project.id));
-    card.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(project.id); }
-    });
-    card.querySelector("[data-delete-project]").addEventListener("click", async (event) => {
-      event.stopPropagation();
-      if (!window.confirm(`Delete "${project.title}" and all of its tasks?`)) return;
-      await runAction(async () => {
-        await apiRequest(`/api/projects/${project.id}`, { method: "DELETE" });
-        if (detailProjectId === project.id) {
-          setDetailProjectId(null);
-          showView("goals");
-        }
-        setSelectedProject("all");
-        await loadState();
-      });
-    });
+    card.innerHTML = `<h3>${escapeHtml(project.title)}</h3><p>${escapeHtml(project.description || "A project without a description. Start with one small step.")}</p><div class="goal-progress"><span>${completed} of ${tasks.length} tasks complete</span><strong>${percent}%</strong></div><div class="progress-track"><span style="width:${percent}%"></span></div><div class="project-actions"><button type="button" class="secondary-button" data-edit-project="${project.id}">Edit project</button></div>`;
+        card.addEventListener("click", () => openProject(project.id));
+        card.addEventListener("keydown", (event) => {
+          if (event.target === card && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); openProject(project.id); }
+        });
+        card.querySelector("[data-edit-project]").addEventListener("click", (event) => {
+          event.stopPropagation();
+          openGoalModal(project);
+        });
     grid.append(card);
   });
   if (!state.projects.length) grid.innerHTML = '<div class="empty-state"><span class="empty-icon">◎</span><h3>Start with a project</h3><p>A clear destination makes the next step easier to see.</p></div>';

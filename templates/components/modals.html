@@ -15,20 +15,21 @@
     <textarea id="task-description" name="description" rows="3" placeholder="Add a little context (optional)" maxlength="240"></textarea>
     <label for="task-estimate">Estimate (minutes)</label>
     <input id="task-estimate" name="estimateMinutes" type="number" min="1" max="10000" placeholder="Optional, e.g. 90">
-    <div class="modal-actions"><button class="secondary-button" type="button" data-close="task-modal">Cancel</button><button class="primary-button" id="task-submit" type="submit">Add task</button></div>
+    <div class="modal-actions"><button class="delete-project-button" id="task-delete" type="button" hidden>Delete task</button><button class="secondary-button" type="button" data-close="task-modal">Cancel</button><button class="primary-button" id="task-submit" type="submit">Add task</button></div>
   </form>
 </dialog>
 
 <dialog class="modal" id="goal-modal">
   <form method="dialog" id="goal-form">
+    <input id="goal-id" name="projectId" type="hidden">
     <div class="modal-header">
-      <div><p class="eyebrow">Set a direction</p><h2>New project</h2></div>
+      <div><p class="eyebrow" id="goal-modal-eyebrow">Set a direction</p><h2 id="goal-modal-heading">New project</h2></div>
       <button class="close-button" type="button" data-close="goal-modal" aria-label="Close">×</button>
     </div>
     <label for="goal-title">Project name <span>*</span></label>
     <input id="goal-title" name="title" type="text" placeholder="What do you want to accomplish?" required maxlength="80">
     <label for="goal-description">Description</label>
     <textarea id="goal-description" name="description" rows="5" placeholder="Why does this matter?"></textarea>
-    <div class="modal-actions"><button class="secondary-button" type="button" data-close="goal-modal">Cancel</button><button class="primary-button" type="submit">Create project</button></div>
+    <div class="modal-actions"><button class="delete-project-button" id="goal-delete" type="button" hidden>Delete project</button><button class="secondary-button" type="button" data-close="goal-modal">Cancel</button><button class="primary-button" id="goal-submit" type="submit">Create project</button></div>
   </form>
 </dialog>

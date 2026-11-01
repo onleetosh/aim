@@ -21,3 +21,5 @@
 .project-group-heading h3 { margin-bottom: 2px; }
 .project-group-heading p, .project-empty { color: var(--muted); font-size: 12px; margin: 0; }
 .project-group-tasks { display: grid; gap: 9px; margin-top: 14px; }
+
+.project-detail-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }

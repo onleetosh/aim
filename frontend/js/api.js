@@ -47,6 +47,17 @@ function localRequest(path, options = {}) {
     saveLocalState(localState);
     return project;
   }
+  if (projectMatch && options.method === "PATCH") {
+    const project = localState.projects.find((item) => item.id === projectMatch[1]);
+    if (!project) throw new Error("Project not found.");
+    if (body.title !== undefined) {
+      if (!String(body.title).trim()) throw new Error("Project title is required.");
+      project.title = String(body.title).trim();
+    }
+    if (body.description !== undefined) project.description = String(body.description).trim();
+    saveLocalState(localState);
+    return project;
+  }
   if (projectMatch && options.method === "DELETE") {
     const projectExists = localState.projects.some((project) => project.id === projectMatch[1]);
     if (!projectExists) throw new Error("Project not found.");

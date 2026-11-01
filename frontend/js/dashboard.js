@@ -93,7 +93,7 @@ function renderDashboard({ recommendation, priorities, overview, intention, acti
 
 export function initializeDashboard() {
   $("#dashboard-new-task-button").addEventListener("click", () => openTaskModal(null));
-  $("#dashboard-new-project-button").addEventListener("click", openGoalModal);
+  $("#dashboard-new-project-button").addEventListener("click", () => openGoalModal());
   $("#available-form").addEventListener("submit", (event) => {
     event.preventDefault();
     const hours = Number(event.currentTarget.hours.value);

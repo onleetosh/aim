@@ -61,6 +61,36 @@ def create_project(user):
         return jsonify(project_from_row(row)), 201
 
 
+@api.patch("/api/projects/<int:project_id>")
+@login_required
+def update_project(user, project_id):
+    data = request.get_json(silent=True) or {}
+    changes = {}
+    if "title" in data:
+        title = str(data["title"]).strip()
+        if not title:
+            return jsonify({"error": "Project title is required."}), 400
+        changes["title"] = title
+    if "description" in data:
+        changes["description"] = str(data["description"]).strip()
+    if not changes:
+        return jsonify({"error": "Nothing to update."}), 400
+
+    assignments = ", ".join(f"{column} = ?" for column in changes)
+    with get_connection() as connection:
+        cursor = connection.execute(
+            f"UPDATE projects SET {assignments} WHERE id = ? AND user_id = ?",
+            (*changes.values(), project_id, user["id"]),
+        )
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Project not found."}), 404
+        row = connection.execute(
+            "SELECT id, title, description FROM projects WHERE id = ?",
+            (project_id,),
+        ).fetchone()
+        return jsonify(project_from_row(row))
+
+
 @api.delete("/api/projects/<int:project_id>")
 @login_required
 def delete_project(user, project_id):
