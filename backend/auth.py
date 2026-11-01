@@ -13,8 +13,10 @@ auth = Blueprint("auth", __name__, url_prefix="/api/auth")
 USERNAME_PATTERN = re.compile(r"^[a-z0-9_.-]{3,30}$")
 MIN_PASSWORD_LENGTH = 8
 MAX_PASSWORD_LENGTH = 128
+# Werkzeug's default (scrypt) needs hashlib.scrypt, which some Python builds lack.
+PASSWORD_HASH_METHOD = "pbkdf2:sha256"
 # Checked when a username does not exist so response time doesn't reveal it.
-DUMMY_HASH = generate_password_hash("not-a-real-password")
+DUMMY_HASH = generate_password_hash("not-a-real-password", method=PASSWORD_HASH_METHOD)
 # Logins from before browser-session cookies lack this marker and are rejected.
 SESSION_VERSION = 2
 
@@ -79,7 +81,7 @@ def register():
         with get_connection() as connection:
             cursor = connection.execute(
                 "INSERT INTO users (username, password_hash) VALUES (?, ?) RETURNING id",
-                (username, generate_password_hash(password)),
+                (username, generate_password_hash(password, method=PASSWORD_HASH_METHOD)),
             )
             user_id = cursor.fetchone()["id"]
     except integrity_errors():
