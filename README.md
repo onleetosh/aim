@@ -2,7 +2,7 @@
 
 A.I.M. is a modern, Kanban-style task manager designed to help me turn personal goals and everyday responsibilities into manageable actions, maintain focus, and make consistent progress toward completion.
 
-**Author:** Tosh · **Course:** CMP 464/343 Product 1 · **Last updated:** October 4, 2026
+**Author:** Tosh · **Course:** CMP 464/343 Product 1 · **Last updated:** November 1, 2026
 
 ---
 
@@ -84,8 +84,11 @@ There is a significant gap between understanding what matters and taking consist
 | **Goal Creation** — Create and define a goal or project with a title and description.| Gives me a clear destination and helps turn vague intentions into something actionable.| MVP|
 | **Task Breakdown** — Create smaller steps or tasks associated with a goal, including descriptions and due dates. | Makes large responsibilities feel manageable and reduces the tendency to procrastinate because I don't know where to start.| MVP|
 | **Agile Workflow** — Organize tasks into Ready, In Progress, Review, and Done stages using a Kanban board.| Gives me a visual understanding of what needs attention, what I'm currently working on, and what I've accomplished. | MVP|
+| **Edit & Delete** — Edit a project or task after it is created; delete it from its edit dialog.| Lets me fix or refine plans as they change without starting over.| MVP|
+| **Accounts** — Sign up and log in; each account has its own projects and tasks.| Keeps my data private and available between sessions.| MVP|
+| **Progress Dashboard & Progress View** — Overview of projects, completed tasks, pending work, and progress statistics and insights.| Helps me evaluate my progress, recognize accomplishments, and identify where I need to refocus. | Built |
+| **Time Tracking** — Log focus time against tasks, record downtime, and set time estimates on tasks.| Helps me set realistic expectations for what I can finish in a day. | Built |
 | **Priority Management** — Assign priority levels to tasks.| Helps me distinguish what is important from what can wait, reducing the feeling of being overwhelmed by competing responsibilities.| Later|
-| **Progress Dashboard** — Display an overview of goals, completed tasks, pending work, and upcoming deadlines.| Helps me evaluate my progress, recognize accomplishments, and identify where I need to refocus. | Later |
 | **Task Labels** — Categorize tasks by responsibility, subject, or type of work.| Helps me organize different areas of life and quickly understand what kind of work needs attention. | Later|
 
 
@@ -98,18 +101,22 @@ There is a significant gap between understanding what matters and taking consist
 * **Manage Workflow:** Move tasks through a simple Kanban workflow: Ready → In Progress → Review → Done.
 * **Project Details:** Open a project to view its description and tasks grouped into New, Active, and Complete.
 * **Drag and Drop:** Move task cards between board columns or project detail groups.
+* **Edit and Delete:** Edit projects and tasks after creation; the delete option appears only in the edit dialog.
+* **Accounts:** Log in or create an account; each account only sees its own data.
+
+### Built beyond the MVP
+
+* Dashboard with progress summaries.
+* Progress view with statistics, completion summaries, and insights.
+* Time tracking: focus entries, downtime entries, daily settings, and task time estimates.
 
 ### Later
 
 *Improvements that can wait until the core experience works.*
 
-* Dashboard with progress summaries.
 * Task priorities.
 * Labels and categorization.
 * Due dates and deadline visibility.
-* Editing and deleting goals and tasks.
-* Progress statistics and completion summaries.
-* Improved project organization.
 
 
 ### Not Doing
@@ -119,10 +126,9 @@ There is a significant gap between understanding what matters and taking consist
 * Real-time collaboration and team management.
 * AI-generated task recommendations or planning.
 * Email, SMS, or push notifications.
-* Complex reporting and analytics.
 * Advanced permission and role management.
 * Calendar integrations.
-* Time tracking and productivity scoring.
+* Productivity scoring.
 * Mobile application development.
 
 ---
@@ -131,24 +137,25 @@ There is a significant gap between understanding what matters and taking consist
 
 ### Front end
 - **Surface:** Web app (desktop and mobile-friendly) with a Kanban-style interface.
-- **Tools:** HTML, CSS, JavaScript, React, and a UI framework like Material-UI or Tailwind CSS.
-- **Why:** A web application provides an accessible environment for managing responsibilities from my computer without requiring a separate mobile application. React supports reusable components and a structured interface for goals, tasks, and Kanban workflows.
+- **Tools:** HTML (Flask/Jinja templates), plain CSS, and vanilla JavaScript modules. No React or UI framework was used.
+- **Why:** A web application provides an accessible environment for managing responsibilities from my computer without requiring a separate mobile application. Plain JavaScript modules kept the app small and free of a build step.
 
 ### Back end
 | Piece | Choice | Why |
 |---|---|---|
 | Server / API | Python / Flask | Lightweight HTTP API for the MVP |
-| Data storage | PostgreSQL | Relational database for both local development and deployment |
-| Outside services (optional) |TBD| |
-| Hosting / deploy | TBD |  |
+| Data storage | PostgreSQL when `DATABASE_URL` is set (via `psycopg`); local SQLite file (`aim.db`) otherwise | Persistent relational storage when deployed, zero-setup local development |
+| Authentication | Flask sessions, signed with `SECRET_KEY` | Per-user projects and tasks |
+| Outside services (optional) | None | |
+| Hosting / deploy | Render (`render.yaml`, Gunicorn) | Simple public test instance |
 
 ### Architecture sketch
 
 ```mermaid
 flowchart LR
-    U["User"] --> FE["React Front End"]
-    FE["HTML/CSS/JavaScript"] --> API["Python / Flask API"]
-    API --> DB[("PostgreSQL Database")]
+    U["User"] --> FE["HTML / CSS / JavaScript"]
+    FE --> API["Python / Flask API"]
+    API --> DB[("PostgreSQL or local SQLite")]
 
 ```
 
@@ -158,9 +165,16 @@ The Flask backend is organized as a Python package:
 app.py                 # Application entry point
 backend/
 ├── __init__.py        # Flask app factory
-├── database.py        # PostgreSQL connection and schema
-├── routes.py          # Web and API endpoints
-└── serializers.py     # Database-row to JSON conversion
+├── database.py        # Database connection and schema
+├── auth.py            # Registration, login, and logout
+├── routes.py          # Page, project, and task endpoints
+├── serializers.py     # Database-row to JSON conversion
+├── dashboard.py       # Dashboard summary endpoint
+├── analytics.py       # Progress statistics endpoint
+├── insights.py        # Progress insights endpoint
+├── focus.py           # Focus time entries and settings
+├── downtime.py        # Downtime entries
+└── dates.py           # Date and number parsing helpers
 ```
 
 The browser code is organized as JavaScript modules:
@@ -170,9 +184,15 @@ frontend/js/
 ├── main.js         # Browser entry point and navigation
 ├── config.js       # Shared state and task statuses
 ├── api.js          # Flask API and file-mode storage requests
+├── auth.js         # Login and sign-up screen
 ├── render.js       # Board, project, and task rendering
 ├── drag-drop.js    # Task drag-and-drop behavior
-├── modals.js       # Task and project forms
+├── modals.js       # Task and project create/edit/delete forms
+├── dashboard.js    # Dashboard view
+├── analytics.js    # Progress statistics view
+├── insights.js     # Progress insights
+├── focus.js        # Time tracking view
+├── downtime.js     # Downtime tracking
 └── utils.js        # DOM, escaping, and action helpers
 ```
 
@@ -185,6 +205,9 @@ frontend/css/
 ├── layout.css      # Shell, navigation, sidebar, and buttons
 ├── board.css       # Filters, board columns, and task cards
 ├── projects.css    # Project cards and project details
+├── dashboard.css   # Dashboard and progress views
+├── downtime.css    # Time tracking views
+├── auth.css        # Login and sign-up screen
 ├── modals.css      # Dialogs and form controls
 └── responsive.css  # Mobile and tablet layouts
 ```
@@ -198,9 +221,15 @@ templates/
     ├── app-shell.html
     ├── sidebar.html
     ├── topbar.html
+    ├── auth.html
     ├── board-view.html
+    ├── dashboard-view.html
     ├── goals-view.html
     ├── project-detail-view.html
+    ├── analytics-view.html
+    ├── insights-view.html
+    ├── focus-view.html
+    ├── downtime-view.html
     ├── modals.html
     └── empty-state.html
 ```
@@ -225,63 +254,3 @@ templates/
 - Whether the initial feature set is achievable within the project timeline.
 - Whether the implemented workflow addresses the original problem rather than simply recreating a digital whiteboard.
 - Whether the application reliably saves and retrieves goals and task progress.
-
-## 7. Running the MVP
-
-The app uses Flask and PostgreSQL in both development and deployment. Install
-the Python dependencies, create a local PostgreSQL database, and set
-`DATABASE_URL` to its connection string before starting the application. For
-example, in PowerShell:
-
-```powershell
-python -m pip install -r requirements.txt
-$env:DATABASE_URL = "postgresql://aim:your-password@localhost:5432/aim"
-python app.py
-```
-
-Create the `aim` database and its database user in PostgreSQL before running
-the app. Or, if you have GNU `make` installed, set `DATABASE_URL` in your
-environment and run `make run`. It creates `.venv`, installs dependencies, and
-starts the dev server. `make help` lists the other targets.
-
-Then visit `http://localhost:5000`. You will see a login screen; choose **Create
-an account** to sign up. Each account has its own projects and tasks, and new
-accounts start empty. The server creates the required tables in PostgreSQL on
-startup.
-
-The interface is rendered from Flask/Jinja templates. `DATABASE_URL` is
-required; the app no longer falls back to a local SQLite file. Existing data in
-`aim.db` is not migrated automatically.
-
-New tasks begin in the project's **New** group. Dragging a task into **Active** changes its status to `Ready`, placing it in the Ready board column. Dragging a task to **Complete** changes its status to `Done`; completed tasks remain available in the project detail view.
-
-## 8. Deploying a test instance
-
-The repository includes a `render.yaml` Blueprint for deploying the Flask app to
-[Render](https://render.com). To create a public test URL:
-
-1. Push the repository, including `render.yaml` and the updated
-   `requirements.txt`, to GitHub.
-2. Sign in to Render and choose **New > Blueprint**.
-3. Connect `onleetosh/aim` and select the branch to deploy.
-4. Accept the service named `aim` and click **Apply**.
-5. Open the `onrender.com` URL Render assigns to the service.
-
-Render runs the app with Gunicorn and checks `/api/state` for service health.
-
-### Persistent data
-
-The app requires `DATABASE_URL` in every environment. Point it to a local
-PostgreSQL instance during development, and to a persistent PostgreSQL service
-when deployed:
-
-1. Create a free PostgreSQL database (for example at [Neon](https://neon.tech)
-   or as a Render PostgreSQL instance) and copy its connection string.
-2. In the Render service, open **Environment** and add `DATABASE_URL` with that
-   connection string (Render prompts for it when applying the Blueprint).
-3. Redeploy. The app creates its tables on first start, then all changes persist
-   across restarts and redeploys.
-
-Login sessions are signed with `SECRET_KEY`. The Blueprint generates one for
-Render automatically; locally a random key is used, so you are logged out
-whenever the dev server restarts (set `SECRET_KEY` to avoid that).
