@@ -131,7 +131,6 @@ export function showView(view) {
   $("#project-detail-view").classList.toggle("hidden", view !== "project-detail");
   $("#dashboard-view").classList.toggle("hidden", view !== "dashboard");
   $("#time-workspace").classList.toggle("hidden", view !== "focus");
-  $("#analytics-workspace").classList.toggle("hidden", view !== "analytics");
 }
 
 function renderMomentum() {

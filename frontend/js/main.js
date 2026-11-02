@@ -6,8 +6,6 @@ import { initializeModals } from "./modals.js";
 import { initializeDowntime, loadDowntime } from "./downtime.js";
 import { loadDashboard, initializeDashboard } from "./dashboard.js";
 import { initializeFocus, loadFocus } from "./focus.js";
-import { initializeAnalytics, loadAnalytics } from "./analytics.js";
-import { initializeInsights, loadInsights } from "./insights.js";
 
 document.querySelectorAll(".nav-item").forEach((button) => button.addEventListener("click", () => {
   document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
@@ -19,10 +17,6 @@ document.querySelectorAll(".nav-item").forEach((button) => button.addEventListen
     loadDowntime();
   }
   if (button.dataset.view === "dashboard") loadDashboard();
-  if (button.dataset.view === "analytics") {
-    loadAnalytics();
-    loadInsights();
-  }
 }));
 document.querySelector("#back-to-projects").addEventListener("click", () => {
   setDetailProjectId(null);
@@ -38,6 +32,4 @@ initializeModals();
 initializeDowntime();
 initializeFocus();
 initializeDashboard();
-initializeAnalytics();
-initializeInsights();
 loadState();

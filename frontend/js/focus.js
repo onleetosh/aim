@@ -78,10 +78,6 @@ function renderFocus() {
   inRange.forEach((entry) => { if (byDate[entry.date]) byDate[entry.date].minutes += entry.minutes; });
   const peak = Math.max(60, ...buckets.map((bucket) => bucket.minutes));
   $("#focus-chart").innerHTML = buckets.map((bucket) => `<div class="bar-col" title="${bucket.date}: ${formatMinutes(bucket.minutes)}"><div class="bar-stack"><span class="bar done" style="height:${(bucket.minutes / peak) * 100}%"></span></div>${rangeDays() <= 7 ? `<small>${bucket.date.slice(5)}</small>` : ""}</div>`).join("");
-
-  $("#focus-entries").innerHTML = inRange.length
-    ? `<table class="time-table"><tbody>${inRange.slice(0, 20).map((entry) => `<tr><td>${entry.date}</td><td>${formatMinutes(entry.minutes)}</td><td>${escapeHtml([entry.taskTitle, entry.note].filter(Boolean).join(" — "))}</td><td><button class="delete-project-button" type="button" data-entry-id="${entry.id}">Delete</button></td></tr>`).join("")}</tbody></table>`
-    : "<p class=\"time-hint\">No sessions yet.</p>";
 }
 
 export function initializeFocus() {
@@ -105,16 +101,6 @@ export function initializeFocus() {
       entries.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id));
       form.minutes.value = "";
       form.note.value = "";
-      renderFocus();
-    });
-  });
-
-  $("#focus-entries").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-entry-id]");
-    if (!button) return;
-    runAction(async () => {
-      await request(`/api/focus/entries/${button.dataset.entryId}`, { method: "DELETE" });
-      entries = entries.filter((entry) => entry.id !== Number(button.dataset.entryId));
       renderFocus();
     });
   });

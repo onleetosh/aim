@@ -54,7 +54,6 @@ function renderDowntime() {
 
   renderChart(inRange);
   renderReasons(inRange, total);
-  renderEntries(inRange);
 }
 
 function renderChart(inRange) {
@@ -86,12 +85,6 @@ function renderReasons(inRange, total) {
     : "<p class=\"time-hint\">No downtime logged in this range.</p>";
 }
 
-function renderEntries(inRange) {
-  $("#downtime-entries").innerHTML = inRange.length
-    ? `<table class="time-table"><tbody>${inRange.slice(0, 20).map((entry) => `<tr><td>${entry.date}</td><td>${formatMinutes(entry.minutes)}</td><td>${escapeHtml([entry.reason, entry.note].filter(Boolean).join(" — "))}</td><td><button class="delete-project-button" type="button" data-entry-id="${entry.id}">Delete</button></td></tr>`).join("")}</tbody></table>`
-    : "<p class=\"time-hint\">No entries yet.</p>";
-}
-
 export function initializeDowntime() {
   const form = $("#downtime-form");
   form.date.value = isoDate(new Date());
@@ -114,16 +107,6 @@ export function initializeDowntime() {
       form.minutes.value = "";
       form.reason.value = "";
       form.note.value = "";
-      renderDowntime();
-    });
-  });
-
-  $("#downtime-entries").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-entry-id]");
-    if (!button) return;
-    runAction(async () => {
-      await request(`/api/downtime/entries/${button.dataset.entryId}`, { method: "DELETE" });
-      entries = entries.filter((entry) => entry.id !== Number(button.dataset.entryId));
       renderDowntime();
     });
   });
