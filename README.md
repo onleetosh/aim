@@ -2,6 +2,8 @@
 
 A.I.M. is a modern, Kanban-style task manager designed to transform personal goals and everyday responsibilities into manageable actions, support sustained focus, and encourage consistent progress toward meaningful completion. Developed with the assistance of AI-powered tools and agents.
 
+**Live Demo -** [A.I.M](https://aim-ebz4.onrender.com/)
+
 **Author:** Tosh · **Course:** CMP 464/343 Product 1 · **Last updated:** November 2, 2026
 
 ---
