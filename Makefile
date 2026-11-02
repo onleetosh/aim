@@ -3,7 +3,7 @@
 
 ifeq ($(OS),Windows_NT)
   VENV_PYTHON := .venv/Scripts/python.exe
-  SYSTEM_PYTHON ?= python
+  SYSTEM_PYTHON ?= py
 else
   VENV_PYTHON := .venv/bin/python
   SYSTEM_PYTHON ?= python3
